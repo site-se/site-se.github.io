@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Stuttering Empire</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;600;700;900&family=Cinzel:wght@400;600;900&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; cursor:none !important; }
+html { width:100%; min-height:100%; background:#000000; scrollbar-width:none; -ms-overflow-style:none; }
+body { width:100%; min-height:100%; overflow-x:hidden; overflow-y:auto; background:#000000; scrollbar-width:none; -ms-overflow-style:none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { display:none; }
+.se-hero-section-body,
+.se-section-body,
+.se-wof-profile-bio,
+.se-members-table td,
+.se-top10-table td,
+.se-allies-table td { user-select:text; -webkit-user-select:text; }
+
+.scanlines { position:fixed; inset:0; z-index:1; pointer-events:none; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px); }
+
+#sword-cursor { position:fixed; top:0; left:0; width:100%; height:100%; z-index:9998; pointer-events:none; opacity:0; transition:opacity 0.4s; }
+
+/* ── KO SITE ── */
+#site-rain { position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+#site-rain canvas { display:block; width:100%!important; height:100%!important; pointer-events:none!important; }
+
+#se-site { position:relative; z-index:2; display:flex; flex-direction:column; min-height:100vh; overflow:visible; }
+
+/* Topbar */
+:root { --topbar-h: 188px; }
+
+.topbar { height:var(--topbar-h); flex-shrink:0; position:relative; z-index:50; background-color:#000000; border-bottom:none; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px 28px 26px; overflow:hidden; }
+.topbar-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; z-index:0; opacity:0.6; display:block; }
+.topbar-bg[src=""] { display:none; }
+.topbar > *:not(.topbar-bg) { position:relative; z-index:2; }
+.topbar-left { display:none; }
+.topbar-right { display:none; }
+.topbar-center { display:none; }
+.topbar-mark { display:none; }
+.topbar-name { display:none; }
+.topbar-exit { display:none; }
+
+/* New header seal */
+.topbar-seal { display:flex; align-items:center; justify-content:center; gap:22px; width:100%; max-width:900px; margin-bottom:15px; }
+.topbar-seal-line { flex:1; height:1px; background:rgba(162,0,0,0.6); max-width:280px; }
+.topbar-seal-diamond { width:9px; height:9px; background:rgba(162,0,0,0.9); transform:rotate(45deg); flex-shrink:0; }
+.topbar-ministry { font-family:'Share Tech Mono',monospace; font-size:13px; letter-spacing:0.42em; color:rgba(255,255,255,0.78); text-transform:uppercase; margin-bottom:11px; text-align:center; }
+.topbar-title { font-family:'Cinzel',serif; font-size:44px; font-weight:600; color:#fff; letter-spacing:0.15em; line-height:1.1; margin-bottom:11px; text-align:center; text-shadow:0 0 50px rgba(162,0,0,0.5), 0 0 100px rgba(162,0,0,0.2); }
+.topbar-subtitle { font-family:'Share Tech Mono',monospace; font-size:13px; letter-spacing:0.32em; color:rgba(255,255,255,0.78); text-align:center; }
+
+/* Layout */
+.se-layout { flex:1; display:flex; position:relative; z-index:2; min-height:max(calc(100vh - var(--topbar-h)), 1400px); }
+
+/* Left nav */
+.se-left-nav { width:274px; flex-shrink:0; background:#000000; border-right:1px solid rgba(162,0,0,0.09); display:flex; flex-direction:column; z-index:20; position:relative; }
+.se-nav-header { padding:0; border-bottom:none; flex-shrink:0; }
+.se-nav-logo-line1 { display:none; }
+.se-nav-logo-line2 { display:none; }
+.se-nav-section-label { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.32em; color:rgba(255,255,255,0.2); padding:15px 19px 5px; text-transform:uppercase; }
+.se-nav-section-label:first-child { padding-top:6.5rem; }
+.se-nav-section-label-foundations { padding-top:6.5rem !important; }
+.se-nav-tabs { overflow:visible; }
+.se-nav-copyright { padding:0.9rem 1.8rem; font-family:'Share Tech Mono',monospace; font-size:0.5rem; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.5); flex-shrink:0; line-height:1.8; }
+
+.se-nav-tab { display:block; padding:0; cursor:none; border-bottom:1px solid rgba(255,255,255,0.03); transition:background 0.25s ease; text-decoration:none; color:#fff; position:relative; overflow:hidden; pointer-events:all; }
+.se-nav-tab:hover,.se-nav-tab.hovered { background:rgba(162,0,0,0.07); }
+.se-nav-tab:hover .se-nav-tab-title,.se-nav-tab.hovered .se-nav-tab-title { color:rgba(210,30,30,0.95)!important; text-shadow:0 0 14px rgba(162,0,0,0.5)!important; }
+.se-nav-tab.active { background:transparent; }
+.se-nav-tab.active .se-nav-tab-title { position:relative; z-index:2; text-shadow:0 0 10px rgba(162,0,0,0.9)!important; font-weight:500; color:rgba(210,30,30,1)!important; }
+.se-nav-tab.active::after { content:''; position:absolute; right:0; top:0; bottom:0; width:2px; background:rgba(162,0,0,0.9); box-shadow:0 0 8px rgba(162,0,0,0.55); }
+.se-nav-tab canvas.tab-canvas { position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; }
+.se-nav-tab-inner { position:relative; z-index:2; display:flex; align-items:center; gap:11px; padding:0.88rem 1.9rem; transition:padding-left 0.22s; }
+.se-nav-tab:hover .se-nav-tab-inner,.se-nav-tab.active .se-nav-tab-inner { padding-left:2.3rem; }
+.se-nav-tab-num { font-family:'Share Tech Mono',monospace; font-size:9.5px; color:rgba(255,255,255,0.2); min-width:19px; transition:color 0.2s; }
+.se-nav-tab:hover .se-nav-tab-num,.se-nav-tab.active .se-nav-tab-num { color:rgba(162,0,0,0.75); }
+.se-nav-tab-title { font-family:'Rajdhani',sans-serif; font-size:1.06rem; font-weight:500; letter-spacing:0.12em; color:rgba(255,255,255,0.62); text-transform:uppercase; flex:1; transition:color 0.2s,text-shadow 0.2s; }
+.se-nav-tab-arrow { font-size:11px; color:rgba(162,0,0,0.8); opacity:0; transform:translateX(-5px); transition:opacity 0.2s,transform 0.2s; }
+.se-nav-tab:hover .se-nav-tab-arrow,.se-nav-tab.active .se-nav-tab-arrow { opacity:1; transform:translateX(0); }
+
+/* Main content */
+.se-right-col { flex:1; display:flex; flex-direction:column; min-width:0; }
+.se-main-content { flex:1; position:relative; }
+.se-page { display:none; padding:0; padding-top:2rem; background:transparent; color:#fff; padding-bottom:6rem; }
+.se-page.active { display:block; }
+.se-text-page-top { padding-bottom:4rem; }
+
+/* Hero nav row — sticky, spans full page width centered across entire viewport */
+.se-hero-links-row { position:sticky; top:0; display:flex; justify-content:space-evenly; align-items:center; padding:1.6rem 2.5rem; z-index:200; pointer-events:all; background:#000000; backdrop-filter:blur(12px); border-bottom:1px solid rgba(162,0,0,0.13); width:100vw; margin-left:calc(-274px); }
+.se-hero-link { font-family:'Rajdhani',sans-serif; font-size:0.96rem; font-weight:400; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.45); text-decoration:none; transition:color 0.2s,text-shadow 0.2s; cursor:none; background:none; border:none; padding:0; pointer-events:all; }
+.se-hero-link:hover,.se-hero-link.hovered { color:rgba(210,30,30,1)!important; text-shadow:0 0 16px rgba(162,0,0,0.85),0 0 4px rgba(162,0,0,1)!important; }
+
+/* Content blocks */
+.se-hero-page-wrapper { width:100%; position:relative; z-index:2; display:flex; flex-direction:column; padding-top:0; }
+.se-hero-section-block { margin-left:8%; margin-right:8%; background:rgba(4,4,13,0.55); border:1px solid rgba(162,0,0,0.1); padding:2.7rem 3.2rem; margin-bottom:1.9rem; margin-top:1.9rem; position:relative; }
+
+.se-hero-section-title { font-family:'Orbitron',sans-serif; font-size:1.5rem; font-weight:700; letter-spacing:5px; margin-bottom:1.5rem; line-height:1.2; color:#fff; }
+.se-hero-section-body { font-family:'Rajdhani',sans-serif; font-size:1.06rem; font-weight:400; line-height:2.1; color:rgba(255,255,255,0.75); }
+.se-hero-heading { font-family:'Orbitron',sans-serif; font-size:clamp(2.5rem,5vw,5rem); font-weight:900; letter-spacing:0.1em; margin-bottom:2.5rem; line-height:1.1; color:#fff; }
+.se-hero-heading em { font-style:normal; color:rgba(162,0,0,0.9); }
+.se-hero-body { font-family:'Rajdhani',sans-serif; font-size:1.06rem; font-weight:300; line-height:1.95; opacity:0.75; width:100%; }
+
+/* Footer links — mirrors the top nav bar style */
+.se-page-footer-links { display:flex; flex-direction:row; align-items:center; justify-content:space-evenly; min-height:76px; padding:0 2.5rem; z-index:200; background:#000000; backdrop-filter:blur(12px); border-top:1px solid rgba(162,0,0,0.13); width:100vw; margin-left:calc(-274px); margin-top:4rem; }
+.se-footer-link { font-family:'Rajdhani',sans-serif; font-size:0.78rem; font-weight:400; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.45); text-decoration:none; line-height:1; transition:color 0.2s,text-shadow 0.2s; cursor:none; background:none; border:none; pointer-events:all; display:flex; align-items:center; justify-content:center; padding:0; margin:0; }
+.se-footer-link:hover,.se-footer-link.hovered { color:rgba(210,30,30,1)!important; text-shadow:0 0 16px rgba(162,0,0,0.85),0 0 4px rgba(162,0,0,1)!important; }
+
+/* Particles */
+.se-particle { position:absolute; width:2px; height:2px; background:rgba(162,0,0,0.7); border-radius:50%; opacity:0.09; animation:koFloat 20s infinite; pointer-events:none; }
+@keyframes koFloat { 0%,100%{transform:translateY(0) translateX(0)} 25%{transform:translateY(-30vh) translateX(10vw)} 50%{transform:translateY(-60vh) translateX(-10vw)} 75%{transform:translateY(-30vh) translateX(5vw)} }
+
+/* Members table */
+.se-members-table { width:100%; border-collapse:collapse; font-family:'Rajdhani',sans-serif; margin-top:0.5rem; }
+.se-members-table thead tr { border-bottom:1px solid rgba(162,0,0,0.14); }
+.se-members-table th { padding:0.8rem 1.3rem; text-align:left; font-family:'Share Tech Mono',monospace; font-size:0.58rem; color:rgba(255,255,255,0.32); letter-spacing:3px; text-transform:uppercase; font-weight:400; }
+.se-members-table th:first-child { width:392px; }
+.se-members-table td { padding:1.2rem 1.3rem; font-size:0.94rem; color:rgba(255,255,255,0.7); letter-spacing:1px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; transition:background 0.15s,color 0.15s; }
+.se-members-table td:first-child { font-size:1.06rem; color:rgba(255,255,255,0.65); letter-spacing:2px; line-height:1.4; width:392px; min-width:392px; max-width:392px; }
+.se-members-table .rank-alt { font-family:inherit; font-size:inherit; letter-spacing:inherit; }
+.se-members-table .role-desc { display:block; font-family:'Share Tech Mono',monospace; font-size:0.58rem; color:rgba(255,255,255,0.28); letter-spacing:1.5px; margin-top:0.3rem; text-transform:uppercase; line-height:1.7; }
+.se-members-table tbody tr:hover td { background:rgba(162,0,0,0.05); }
+/* Rank colors — exact from source, red-theme hover backgrounds preserved */
+.se-rank-founder td:first-child { color:#a20000!important; }
+.se-rank-founder .role-desc { color:rgba(162,0,0,0.75)!important; }
+.se-rank-founder:hover td { background:rgba(162,0,0,0.09)!important; }
+.se-rank-founder .rank-alt { color:rgba(162,0,0,0.75)!important; }
+.se-rank-cofounder td:first-child { color:#a20000!important; }
+.se-rank-cofounder .role-desc { color:rgba(162,0,0,0.75)!important; }
+.se-rank-cofounder:hover td { background:rgba(162,0,0,0.09)!important; }
+.se-rank-cofounder .rank-alt { color:rgba(203,0,0,0.75)!important; }
+.se-rank-leader td:first-child { color:#a12b2b!important; }
+.se-rank-leader .role-desc { color:rgba(161,43,43,0.8)!important; }
+.se-rank-leader:hover td { background:rgba(161,43,43,0.09)!important; }
+.se-rank-coleader td:first-child { color:#008f92!important; }
+.se-rank-coleader .role-desc { color:rgba(0,143,146,0.8)!important; }
+.se-rank-coleader:hover td { background:rgba(0,143,146,0.09)!important; }
+.se-rank-goa td:first-child { color:#afafaf!important; }
+.se-rank-goa .role-desc { color:rgba(175,175,175,0.7)!important; }
+.se-rank-goa:hover td { background:rgba(175,175,175,0.09)!important; }
+.se-rank-hoe td:first-child { color:#5900ff!important; }
+.se-rank-hoe .role-desc { color:rgba(89,0,255,0.75)!important; }
+.se-rank-hoe:hover td { background:rgba(89,0,255,0.09)!important; }
+.se-rank-educator td:first-child { color:#6a1aff!important; }
+.se-rank-educator .role-desc { color:rgba(106,26,255,0.75)!important; }
+.se-rank-educator:hover td { background:rgba(106,26,255,0.09)!important; }
+/* New ranks */
+.se-rank-minister td:first-child { color:#a20000!important; }
+.se-rank-minister .role-desc { color:rgba(162,0,0,0.75)!important; }
+.se-rank-minister:hover td { background:rgba(162,0,0,0.09)!important; }
+.se-rank-deputy td:first-child { color:#a12b2b!important; }
+.se-rank-deputy .role-desc { color:rgba(161,43,43,0.8)!important; }
+.se-rank-deputy:hover td { background:rgba(161,43,43,0.09)!important; }
+.se-rank-ombudsman td:first-child { color:#d35b5b!important; }
+.se-rank-ombudsman .role-desc { color:rgba(212,91,91,0.8)!important; }
+.se-rank-ombudsman:hover td { background:rgba(212,91,91,0.09)!important; }
+.se-rank-hotb td:first-child { color:#b8942a!important; }
+.se-rank-hotb .role-desc { color:rgba(184,148,42,0.75)!important; }
+.se-rank-hotb:hover td { background:rgba(184,148,42,0.09)!important; }
+.se-rank-cos td:first-child { color:#afafaf!important; }
+.se-rank-cos .role-desc { color:rgba(175,175,175,0.7)!important; }
+.se-rank-cos:hover td { background:rgba(175,175,175,0.09)!important; }
+.se-rank-gen td:first-child { color:#afafaf!important; }
+.se-rank-gen .role-desc { color:rgba(175,175,175,0.7)!important; }
+.se-rank-gen:hover td { background:rgba(175,175,175,0.09)!important; }
+.se-rank-advisor td:first-child { color:#6a1aff!important; }
+.se-rank-advisor .role-desc { color:rgba(106,26,255,0.75)!important; }
+.se-rank-advisor:hover td { background:rgba(106,26,255,0.09)!important; }
+.se-rank-coffeemaker td:first-child { color:#3e1c00!important; }
+.se-rank-coffeemaker .role-desc { color:rgba(62,28,0,0.8)!important; }
+.se-rank-coffeemaker:hover td { background:rgba(62,28,0,0.09)!important; }
+.se-rank-lower td:first-child { color:#919191!important; }
+.se-rank-lower .role-desc { color:rgba(145,145,145,0.7)!important; }
+.se-rank-lower:hover td { background:rgba(145,145,145,0.07)!important; }
+
+/* ── ADDITIONAL RANK CLASSES ── */
+.se-rank-mod td:first-child { color:#a12b2b!important; }
+.se-rank-mod .role-desc { color:rgba(161,43,43,0.8)!important; }
+.se-rank-mod:hover td { background:rgba(161,43,43,0.09)!important; }
+
+.se-rank-doi td:first-child { color:#7d0000!important; }
+.se-rank-doi .role-desc { color:rgba(125,0,0,0.8)!important; }
+.se-rank-doi:hover td { background:rgba(125,0,0,0.09)!important; }
+
+.se-rank-goarmy td:first-child { color:#6e1010!important; }
+.se-rank-goarmy .role-desc { color:rgba(110,16,16,0.8)!important; }
+.se-rank-goarmy:hover td { background:rgba(110,16,16,0.09)!important; }
+
+/* Minister of Finance — #ca4141 */
+.se-rank-minfin td:first-child { color:#ca4141!important; }
+.se-rank-minfin .role-desc { color:rgba(203,65,65,0.8)!important; }
+.se-rank-minfin:hover td { background:rgba(203,65,65,0.09)!important; }
+
+/* Minister of Communications, Recruitment, Without Portfolio — #d58686 */
+.se-rank-869 td:first-child { color:#d58686!important; }
+.se-rank-869 .role-desc { color:rgba(213,134,134,0.8)!important; }
+.se-rank-869:hover td { background:rgba(213,134,134,0.09)!important; }
+
+.se-rank-minedu td:first-child { color:#b53636!important; }
+.se-rank-minedu .role-desc { color:rgba(181,54,54,0.8)!important; }
+.se-rank-minedu:hover td { background:rgba(181,54,54,0.09)!important; }
+
+.se-rank-appr td:first-child { color:#009bb3!important; }
+.se-rank-appr .role-desc { color:rgba(0,155,179,0.8)!important; }
+.se-rank-appr:hover td { background:rgba(0,155,179,0.09)!important; }
+
+.se-rank-868 td:first-child { color:#868687!important; }
+.se-rank-868 .role-desc { color:rgba(134,134,135,0.8)!important; }
+.se-rank-868:hover td { background:rgba(134,134,135,0.09)!important; }
+
+/* Top 10 */
+.se-top10-main-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:2rem; align-items:start; width:100%; max-width:900px; }
+.se-top10-col-1 { display:flex; flex-direction:column; gap:2rem; }
+.se-top10-year-block { margin-bottom:0; }
+.se-top10-year-label { font-family:'Orbitron',sans-serif; font-size:1.06rem; font-weight:600; color:#fff; letter-spacing:5px; margin-bottom:0.75rem; border-bottom:1px solid rgba(162,0,0,0.14); padding-bottom:0.4rem; }
+.se-top10-table { width:100%; border-collapse:collapse; font-family:'Rajdhani',sans-serif; }
+.se-top10-table thead tr { border-bottom:1px solid rgba(162,0,0,0.12); }
+.se-top10-table th { padding:0.55rem 0.85rem; text-align:left; font-family:'Share Tech Mono',monospace; font-size:0.58rem; color:rgba(255,255,255,0.32); letter-spacing:3px; text-transform:uppercase; font-weight:400; }
+.se-top10-table th:first-child { width:40px; text-align:center; }
+.se-top10-table td { padding:0.72rem 0.85rem; font-size:0.88rem; color:rgba(255,255,255,0.7); letter-spacing:1px; border-bottom:1px solid rgba(255,255,255,0.04); transition:all 0.15s; }
+.se-top10-table td:first-child { text-align:center; font-size:1.06rem; color:rgba(255,255,255,0.3); }
+.se-top10-table tbody tr:hover td { background:rgba(162,0,0,0.06); }
+.se-top10-table tbody tr:hover td:not(:first-child) { color:rgba(210,30,30,1); text-shadow:0 0 10px rgba(162,0,0,0.5); }
+.se-top10-table tbody tr:hover td:first-child { color:rgba(210,30,30,1); text-shadow:0 0 10px rgba(162,0,0,0.5); }
+
+/* Wall of Fame */
+.se-wof-list { display:flex; flex-direction:column; gap:2.7rem; width:100%; max-width:820px; margin-top:2.3rem; }
+.se-wof-profile { display:flex; gap:2.2rem; align-items:flex-start; padding-bottom:2.7rem; border-bottom:1px solid rgba(162,0,0,0.09); }
+.se-wof-profile:last-child { border-bottom:none; }
+.se-wof-portrait { flex-shrink:0; width:116px; height:116px; object-fit:cover; object-position:center top; border:1px solid rgba(162,0,0,0.22); filter:grayscale(0.15) contrast(1.05); }
+.se-wof-profile-info { flex:1; }
+.se-wof-profile-name { font-family:'Orbitron',sans-serif; font-size:0.91rem; font-weight:600; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.85); margin-bottom:0.28rem; }
+.se-wof-profile-tag { font-family:'Share Tech Mono',monospace; font-size:0.54rem; letter-spacing:3px; text-transform:uppercase; color:rgba(162,0,0,0.7); margin-bottom:0.8rem; }
+.se-wof-profile-bio { font-family:'Rajdhani',sans-serif; font-size:0.98rem; font-weight:400; line-height:1.95; color:rgba(255,255,255,0.7); }
+
+/* Allies */
+.se-allies-table { width:100%; border-collapse:collapse; margin-top:0.5rem; table-layout:fixed; font-family:'Rajdhani',sans-serif; }
+.se-allies-table thead tr { border-bottom:1px solid rgba(162,0,0,0.14); }
+.se-allies-table th { padding:0.8rem 1.05rem; text-align:left; font-family:'Share Tech Mono',monospace; font-size:0.58rem; color:rgba(255,255,255,0.32); letter-spacing:3px; text-transform:uppercase; font-weight:400; width:20%; }
+.se-allies-table td { padding:1.08rem; font-size:0.97rem; color:rgba(255,255,255,0.7); letter-spacing:0.5px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; transition:background 0.15s,color 0.15s; }
+/* Alliances table — same hover as Top 10 */
+.se-allies-table tbody tr:hover td { background:rgba(162,0,0,0.06); color:rgba(210,30,30,1); text-shadow:0 0 10px rgba(162,0,0,0.5); }
+ 50%{transform:translateY(-10px)} }
+
+/* Topbar meta info */
+.topbar-meta { display:flex; align-items:center; gap:0; font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:0.18em; color:rgba(255,255,255,0.35); }
+.topbar-meta-sep { padding:0 14px; color:rgba(255,255,255,0.1); }
+.topbar-days { color:rgba(255,255,255,0.45); }
+.topbar-datetime { color:rgba(255,255,255,0.45); }
+.topbar-quote { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:0.14em; color:rgba(255,255,255,0.3); font-style:italic; }
+.topbar-center { flex:1; display:flex; align-items:center; justify-content:center; }
+
+
+
+/* ── MEDIA PAGE ── */
+.se-media-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; width:100%; margin:-2.5rem -3rem; width:calc(100% + 6rem); }
+.se-media-grid iframe { display:block; width:100%; aspect-ratio:16/9; border:none; vertical-align:bottom; }
+
+/* ── IDEOLOGY PAGE ── */
+.se-ideology-intro { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:400; line-height:2.1; color:rgba(255,255,255,0.75); margin-bottom:2.2rem; }
+.se-ideology-section { margin-bottom:2rem; }
+.se-ideology-heading { font-family:'Orbitron',sans-serif; font-size:0.78rem; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:rgba(162,0,0,0.9); border-bottom:1px solid rgba(162,0,0,0.18); padding-bottom:0.5rem; margin-bottom:1.2rem; }
+.se-ideology-body { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:400; line-height:2.1; color:rgba(255,255,255,0.75); }
+.se-ideology-list { list-style:none; padding:0; margin:0 0 0.4rem 0; }
+.se-ideology-list li { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:400; line-height:2.1; color:rgba(255,255,255,0.75); display:flex; gap:0.75rem; }
+.se-ideology-list li .li-num { font-family:'Share Tech Mono',monospace; font-size:0.72rem; color:rgba(255,255,255,0.75); min-width:1.4rem; padding-top:0.32rem; flex-shrink:0; }
+.se-ideology-chain { font-family:'Share Tech Mono',monospace; font-size:0.72rem; line-height:2.0; color:rgba(255,255,255,0.75); margin-top:1.4rem; padding:1rem 1.4rem; border-left:2px solid rgba(162,0,0,0.35); background:rgba(162,0,0,0.04); white-space:pre-wrap; }
+.se-ideology-chain .ch { color:rgba(255,255,255,0.75); }
+.se-ideology-eq { font-family:'Share Tech Mono',monospace; font-size:0.75rem; letter-spacing:0.04em; color:rgba(255,255,255,0.75); margin:1.2rem 0 0.2rem; padding:0.7rem 1.4rem; border-left:2px solid rgba(162,0,0,0.35); background:rgba(162,0,0,0.04); white-space:pre-wrap; }
+.se-ideology-eq .ch { color:rgba(255,255,255,0.75); }
+.se-ideology-disclaimer { font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:400; color:rgba(255,255,255,0.75); margin-top:1.8rem; padding-top:1rem; border-top:1px solid rgba(162,0,0,0.15); line-height:2.1; }
+
+
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+<canvas id="sword-cursor"></canvas>
+
+
+<!-- KO SITE -->
+<div id="se-site">
+  <div id="site-rain"></div>
+  <div class="topbar">
+    <!-- Header background image — replace src with your image URL -->
+    <img class="topbar-bg" src="https://media.discordapp.net/attachments/1173454466700288052/1497810654684254349/Screenshot202026-04-2620at206.03.18E280AFAM.png?ex=69ef8920&is=69ee37a0&hm=bb4ac9dc3db350d8f2585c76df95fcc53cb0081ef5b86a3cc37726d35d0e6dc5&=&format=webp&quality=lossless&width=2793&height=631" alt="" aria-hidden="true">
+    <div class="topbar-seal">
+      <div class="topbar-seal-line"></div>
+      <div class="topbar-seal-diamond"></div>
+      <div class="topbar-seal-line"></div>
+    </div>
+    <div class="topbar-ministry"><span id="days-el">1200</span> days online &nbsp;·&nbsp; 190 members &nbsp;·&nbsp; &#169; 2026 Copyright reserved &nbsp;·&nbsp; No medical advice given</div>
+    <div class="topbar-title">The Stuttering Empire (SE)</div>
+    <div class="topbar-subtitle">A collective committed to the relentless pursuit of material and abstract truths through praxis of experimentation, continuous refinement of our methods, and the inevitable triumph stemming from intellectual attrition.</div>
+  </div>
+  <div class="se-layout">
+    <nav class="se-left-nav">
+      <div class="se-nav-header"></div>
+      <div class="se-nav-tabs" id="koNavTabs"></div>
+    </nav>
+    <div class="se-right-col">
+      <div class="se-hero-links-row" id="koHeroNavRow">
+        <button class="se-hero-link" onclick="koShowPage(0)">Home</button>
+        <button class="se-hero-link" onclick="koShowPage(1)">Rules</button>
+        <button class="se-hero-link" onclick="koShowPage(2)">Constitution</button>
+        <button class="se-hero-link" onclick="koShowPage(3)">Members List</button>
+        <button class="se-hero-link" onclick="koShowPage(4)">Wall of Fame</button>
+        <button class="se-hero-link" onclick="koShowPage(5)">Alliances</button>
+      </div>
+      <main class="se-main-content" id="koMainContent"></main>
+      <div class="se-page-footer-links">
+          <span class="se-footer-link" onclick="window.open('https://discord.gg/Ko','_blank')">Discord</span>
+          <span class="se-footer-link" onclick="window.open('https://www.youtube.com/@TheStutteringBrotherhood','_blank')">Main Channel</span>
+          <span class="se-footer-link" onclick="window.open('https://www.youtube.com/@reverseyourstuttering','_blank')">Stuttering Channel</span>
+          <span class="se-footer-link">To Be Decided</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── DOT CURSOR ── */
+
+
+
+
+
+
+
+/* ══════════════════════════════════════════
+   ENTER / LOGOUT
+══════════════════════════════════════════ */
+
+
+function startClock(){
+  const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  function ordinal(d){const s=['th','st','nd','rd'],v=d%100;return d+(s[(v-20)%10]||s[v]||s[0]);}
+  function monthName(m){return['January','February','March','April','May','June','July','August','September','October','November','December'][m];}
+  function updateClock(){
+    const now=new Date();
+    // Days counter: completed days between Oct 15 2022 and today (exclusive both ends)
+    const todayUTC=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()));
+    const foundedUTC=new Date(Date.UTC(2022,9,15));
+    const days=Math.max(0,Math.round((todayUTC-foundedUTC)/86400000)-1);
+    const dEl=document.getElementById('days-el');
+    if(dEl)dEl.textContent=days.toLocaleString();
+    // Date + time in user's local timezone
+    const localDate=new Date(now.toLocaleString('en-US',{timeZone:userTZ}));
+    const dateStr=monthName(localDate.getMonth())+' '+ordinal(localDate.getDate())+', '+localDate.getFullYear();
+    const timeStr=localDate.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+    const dtEl=document.getElementById('datetime-el');
+    if(dtEl)dtEl.textContent=dateStr+', '+timeStr;
+  }
+  updateClock();setInterval(updateClock,1000);
+  window.updateClock=updateClock;
+}
+
+function koAttachLinkHovers(){
+  document.querySelectorAll('.se-footer-link,#koHeroNavRow .se-hero-link').forEach(el=>{
+    if(el.dataset.hb)return;el.dataset.hb='1';
+    el.addEventListener('mouseenter',()=>el.classList.add('hovered'));
+    el.addEventListener('mouseleave',()=>el.classList.remove('hovered'));
+  });
+}
+
+/* ══════════════════════════════════════════
+   SECTIONS DATA
+══════════════════════════════════════════ */
+const koSections=[
+  {title:"Home",isHero:true},
+  {title:"Rules",isRules:true},
+  {title:"Constitution",isIdeology:true},
+  {title:"Members List",isMembersList:true},
+  {title:"Wall of Fame",isWallOfFame:true},
+  {title:"Alliances",isAllies:true},
+  {title:"Anxiety",isAnxiety:true},
+  {title:"Stuttering",isStuttering:true},
+  {title:"Selective Mutism",isSelectiveMutism:true},
+  {title:"OCD",isOCD:true},
+  {title:"Trauma",isTrauma:true},
+  {title:"Depression",isDepression:true},
+  {title:"ADHD",isADHD:true},
+  {title:"Insomnia",isInsomnia:true},
+  {title:"Addiction",isAddiction:true},
+  {title:"Meditation",isMeditation:true},
+  {title:"Exposure Therapy",isExposureTherapy:true},
+  {title:"Correlation vs. Causation",isCausality:true},
+];
+
+const wofMembers=[
+  {name:"Demented",img:"https://cdn.discordapp.com/avatars/1169942399875829831/3f62ed4b1124a29d1db4de494304f504.webp?size=240",bio:"Demented founded the Stuttering Empire that expanded its sphere to more than just stuttering with the amount of accumulated knowledge that has been created. The official founding happened on October 15, 2022 which is 1,200+ uninterrupted days of activity. He amassed 150 subscribers on Youtube just after 7 videos and the first video uploaded amassed 6,000 views; for such a niche topic that being stuttering this is more than impressive. He majored in applied mathematics has a background in 2 years supervised and 2 years unsupervised neuroscience research at University mainly dealing with the default-mode network and task-positive network of the brain and how they relate, where elementary graph theory was used. He also has a philosophy and computer programming background. He created the first ever Stuttering Theory of Everything fully explaining in detail the cause of stuttering by removing every relevant possible correlation as well as coming up with the application for stopping stuttering by creating the technique \'Mouth Mechanics\' in 2021. He has done the same for an array of problems including anxiety, negative emotions, trauma and OCD. He also explains how to avoid the correlation vs. causation problem and how to have a successful implementation of exposure therapy."},
+  {name:"Book",img:"https://cdn.discordapp.com/avatars/491359880054308895/57a6e5a332363b495f0143638c82c0d3.webp?size=240",bio:"Without Book we would not have been where we are today. He added great contribution to the activity of SE and kept it active from the beginning throughout mid 2023. Him getting banned from SSG was a pivotal event that led to the discussion and participation of the breakaway rebellion of SSG in October 2022 that led to the creation. He was rumored to have been a computer hacker and still remains a mystery as to who he was as an individual behind the scenes. This made him inactive and became the dark horse of SE."},
+  {name:"Furqan",img:"https://deadline.com/wp-content/uploads/2016/08/thomas-gibson-hotch-criminal-minds-cbs.jpg",bio:"Furqan has demonstrated incomparable longevity as he has been in SE from the very beginning starting in late 2022. Furqan participated in more server conflicts than other SE member. He was the leader against the Stuttering Support Group (SSG) and the original Social Anxiety server (SA). He is Pakistani-Canadian who continues to be a crucial member in our development."},
+  {name:"RJ",img:"https://ichef.bbci.co.uk/news/1536/cpsprodpb/5b92/live/de9e37f0-2966-11f1-a2fb-cb82ebb56cce.jpg.webp",bio:"RJ has been here since the beginning. He is a non-denominational Trinitarian Christian and is serious about the conservative party of the United States."},
+  {name:"Yellow Submarine",img:"https://www.lego.com/cdn/product-assets/product.img.pri/21306_Prod.jpg?format=webply&fit=bounds&quality=60&width=500&height=500&dpr=2",bio:"Yellow Submarine was a top advisor for 1.5 years where he instilled discipline and loyalty across the members thus unifying the empire to a large degree. He is also responsible for participating in two major conflicts, namely against SA and SSG. He was responsible for gathering intelligence and advising Demented whenever necessary. He was also known for his high intellect and is responsible for the one star review of SSG. He ended up leaving Discord and isolated himself from everyone due to persistent trauma."},
+  {name:"Craig Coffee",img:"https://cdn.discordapp.com/avatars/917148919899758633/6b565f7ad62045fcd128f87afa519597.webp?size=240",bio:"Craig Coffee is known for his charisma, ability to communicate and strong eye contact. His ability to present information clearly and concisely is hard to beat. He is known for making walking tours while turning the camera onto himself having a conversation not into the camera but through the camera speaking directly to his audience. He is particularly known for the mall video and the Starbucks videos as he\'s ordering coffee. He has shown high level confidence by being able to share his experiences with how he was able to significantly reduce his stuttering and how he has had 20 years of experience doing so. He has such high confidence that he can record people without feeling social pressure. He is from Florida and he has a cubicle job in business/finance. He united the VC for a few months span during 2023."},
+  {name:"Ndog",img:"https://images.alphacoders.com/672/672535.jpg",bio:"Ndog was a former Founder alongside Demented in late 2022 and took part of the SSG breakaway rebellion. In mid 2023 he was overthrown by an inside coup promoting Demented as the sole Founder. He was also known for his funny stories. He comes from Melbourne, Australia and used to work in data entry and web development."},
+  {name:"Puppy",img:"https://blenderartists.org/uploads/default/optimized/4X/d/f/3/df33f66b47120ead140673f821559a1f06e0c9b6_2_1380x992.png",bio:"Puppy is a true pioneer of the stuttering community. He is known for self-experimentation trying out as many different methods as possible to try to get to the bottom of what stuttering even is and how it is caused. He continued to do trial-and-error and was able to gather useful insights such as how it doesn\'t matter the sound you stutter on and that stuttering has only one cause for everyone. He also said to take a slight pause as soon as you feel the block onsetting instead of trying to push through the word which he calls the mental reset."},
+  {name:"Johnny",img:"https://images.steamusercontent.com/ugc/860613165082208094/68078CA34981C79BB59096EA9581BD9DADF5BF2A/?imw=128&imh=128&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true",bio:"Johnny has demonstrated immense loyalty to us and is not only here from the very beginning but is our first Youtube subscriber. He is a dual citizen of Moldova and Romania. He worked alongside Puppy back in 2021 and 2022 when it came to stuttering experimentation testing out new techniques and reporting back results, thus playing a critical role when it comes to the conversation of stuttering. He also has a lot of knowledge in regards to history and geopolitics."},
+  {name:"Ibz",img:"https://i.ytimg.com/vi/HA5Kvpycm_4/hq720.jpg?sqp=-oaymwE7CK4FEIIDSFryq4qpAy0IARUAAAAAGAElAADIQj0AgKJD8AEB-AG2CIAC0AWKAgwIABABGCogKih_MA8=&rs=AOn4CLBrAIWo47pAli3LCnvlHXVM1qFSeA",bio:"Ibz was indirectly there from the beginning and directly there since early 2023. He played a critical role in our development. He is a non-dual Sufi Muslim who believes the Qu\'ran contains the truth and rejects the Hadiths while affirming Wahdat al-Wujud, a rare Quranist position. He is strongly influenced by Zen Buddhism. He believes in the existence of extraterrestrials and UFO\'s by rejecting the Fermi paradox. He believes in free will and that all Abrahamic religions contain similar truths. He has an intuition theory stating that you can obtain objective truths about reality by using strong intuition. He graduated with a degree in Psychology from the United Kingdom. He also believes in human reasoning to find truth and that reality is above logic and believes not only that the sense of self is an illusion but that categories such as objectivity vs. subjectivity are also illusory fragmentations of the mind."},
+  {name:"Dragon",img:"https://cdn.discordapp.com/avatars/316917040713826306/49f82196af7efb83dff74d220d8923b1.webp?size=240",bio:"Dragon launched a spiritual crusade throughout 2024. He is a Romanian spiritual master who is experienced with nano-based particle technology, quantum healing, energy work, weave energy, shamanic rituals, dimensional travel, astral projection, remote viewing, tai chi and sword fighting. He also knows a thing or two about fighting demonic energy. He also does past life readings free of charge and can make prophecies about the future."},
+  {name:"Troof",img:"https://archimedes-lab.org/wp-content/uploads/2019/10/GoldenRatio_YinYang.jpg",bio:"Troof is a loyal member who has a lot of experience in Zen Buddhism. He believes that the best way to meditate is by doing nothing. First you need to put in a lot of effort and when you realize you don't make progress you give up the goal of trying to make effort and that leads to you making a lot less effort thus leading to non-doing. In other words you come up with a realization that you do not need to do anything to achieve the goal. He calls it the 24-hour let go where he does it naturally throughout the day which is how advanced practitioners do it. He views traditional meditation where you sit down in the full-lotus position is for beginners. Terms which mean the same thing: Acceptance/non-doing/non-reaction He is from Texas and he does AI research where he developed theories regarding the usage of algorithms on how to teach English to AI."},
+  {name:"Pell",img:"https://cdn.discordapp.com/avatars/439943171049259018/3fff3221edb82e939add7031b052e5c4.webp?size=240",bio:"Pell is a high level Rust backend developer and a pilot as a certified flight instructor. He has 1,000 combined hours of flight time. He was interviewed by Sam Altman for a position in Y Combinator. He holds a CCNA network certification. He used to be a programmer for the largest private World of Warcraft server. He is known for his time in SE for frequent voice calls."},
+  {name:"Radius",img:"https://i.redd.it/nr0pgqux6j6e1.jpeg",bio:"Radius is a gamer who hosted a lot of voice calls and was the first and only SE VC champion that reigned for 330+ consecutive days. He has beaten many games such as Firewatch, Superliminal, Resident Evil series, has 400+ battle royal victories in Fortnite. He single handedly united the VC."},
+  {name:"Pierce",img:"https://www.armyrecognition.com/images/stories/news/2025/february/Flash_News_Germany_Revolutionizes_Tank_Development_with_Orders_for_New_Leopard_3_Armed_with_130mm_Cannon_001.jpg",bio:"He is a loyal member from Lebanon where he demonstrated his ability to evolve from being immature to more mature and is getting smarter each day. He also has a lot of hair on his head."},
+  {name:"Samwill",img:"https://cdn.discordapp.com/avatars/687774679007494164/3c5ac019a34a3324902776f72fe9a0ae.webp?size=240",bio:"Samwill is well-versed in the Abrahamic religions particularly in Islam and Christianity. He is an American who studies Arabic and often recites the Qu\'ran. He has a strong Unitarian Christian position which aligns with the Tawhid. He believes that the real rift is not between Christianity and Islam but the Abrahamic religions against both Atheism and Polytheism and that we need to spread more cooperation and less individualism to achieve societal unity. He also talks about the 10 Commandments and how this is objective to all humans and how they should follow them. He says that believing in God is not enough and that you must actively worship God by following his word by doing good deeds and that you have a moral obligation to do the right thing. Passively allowing evil in the world is considered to be an act of evil in and of itself. His favorite Sunni school of jurisprudence is the Maliki school. He also founded Longhouse 2028 which is our first official ally which is where you can learn more about various topics including religion, politics and astrology."},
+  {name:"Javier",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Flag_of_Israel.svg/1920px-Flag_of_Israel.svg.png",bio:"Javier is an investigator that gathers information about others in a discrete fashion but without bad intentions. He first made a name for himself in Meditation Mind."},
+  {name:"Ahmed",img:"https://images7.alphacoders.com/318/thumb-1920-318340.jpg",bio:"Ahmed is a Pakistani medical student who excels in reading the Qu\'ran, Sunnah and the Hadiths. He doesn\'t only read for leisure but also to understand. He supports and adheres to the Athari creed and Hanafi jurisprudence. He is with the Salafism movement where the Qu\'ran is taken more literally and does not rely much on human reasoning/metaphorical interpretation but rather heavy on sourcing from Islamic text. He has made consistent contributions to educating others primarily on Islam."},
+  {name:"Joker",img:"https://www.standrewsgreekorthodoxcathedral.co.uk/wp-content/uploads/2021/01/bed6c76d5446e6cca47f71680bcfca28.jpg",bio:"Joker is a Kurd living in the UK and recently turned Orthodox Christian who is a loyal member of ours. He makes great contributions and teaches us about topics such as history, monotheistic religion, ethics, ethnicities and geopolitics."},
+  {name:"Programatik",img:"https://miro.medium.com/v2/resize:fit:1400/format:webp/0*Eqqrv9zVpH99X726.png",bio:"Has a background in computer programming particularly using the Rust language. He is also into investing and has his own programming team. He is into Zen Buddhism, breathing exercises, working out and has an overall goal of improving himself and his surroundings."},
+  {name:"Behrami",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Field_Marshal_Asim_Munir.jpg/500px-Field_Marshal_Asim_Munir.jpg",bio:"Behrami is a Pakistani student who is serious about educating others on Salafism. He takes religion seriously and teaches others with rigor. He believes the earth is flat and rejects evolution. If you do not take Islam seriously then you have a risk of getting takfir\'d and be called a Roblox Muslim."},
+  {name:"Elad",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Flag_of_Israel.svg/1920px-Flag_of_Israel.svg.png",bio:"An advanced spiritual practitioner who knows how to work with consciousness. Not much is known about the work he does because not many people know what and how to do what he does. He is a strong behind the scenes support of the group."}
+];
+
+/* ══════════════════════════════════════════
+   BUILD NAV
+══════════════════════════════════════════ */
+function buildNav(){
+  const navEl=document.getElementById('koNavTabs');
+  const coreL=document.createElement('div');coreL.className='se-nav-section-label se-nav-section-label-foundations';coreL.textContent='Foundations';navEl.appendChild(coreL);
+  koSections.forEach((section,i)=>{
+    if(i===6){const rl=document.createElement('div');rl.className='se-nav-section-label';rl.textContent='Our Solutions';navEl.appendChild(rl);}
+    const tab=document.createElement('a');
+    tab.className='se-nav-tab'+(i===0?' active':'');tab.href='#';tab.dataset.index=i;
+    tab.innerHTML=`<div class="se-nav-tab-inner"><span class="se-nav-tab-num">${String(i+1).padStart(2,'0')}</span><span class="se-nav-tab-title">${section.title}</span><span class="se-nav-tab-arrow">\u203a</span></div>`;
+    tab.addEventListener('click',e=>{e.preventDefault();koShowPage(i);});
+    tab.addEventListener('mouseenter',()=>{if(!tab.classList.contains('active'))tab.classList.add('hovered');koAttachHoverCanvas(tab);});
+    tab.addEventListener('mouseleave',()=>{tab.classList.remove('hovered');koRemoveHoverCanvas(tab);});
+    navEl.appendChild(tab);
+  });
+  buildPages();koShowPage(0);
+}
+
+/* ══════════════════════════════════════════
+   BUILD PAGES
+══════════════════════════════════════════ */
+function buildPages(){
+  const contentEl=document.getElementById('koMainContent');
+  koSections.forEach((section,i)=>{
+    const page=document.createElement('div');
+    page.id='se-page-'+i;
+    page.className='se-page se-text-page-top'+(i===0?' active':'');
+
+    if(section.isHero){
+      page.innerHTML=`<div class="se-hero-page-wrapper"><div class="se-hero-section-block"><h2 class="se-hero-section-title">Our History</h2><p class="se-hero-section-body">We were founded by Demented on October 15, 2022 as the Stuttering Empire where we branched off from the Stuttering Support Group due to reasons of censorship and mass banning. We needed to make it mission to help as many people as possible when it came to stuttering because what we were doing was much more effective compared to what others are doing. This led to jealousy amongst members of SSG which led to our breakaway. Ever since our founding, we have been active, consistent and determined to achieve the mission to gain as much relevant knowledge as possible when it comes to stopping stuttering while being able to produce effective results. I founded a speech technique called Mouth Mechanics back in 2021 where it helped me go from a severe hard blocker to much more fluent, nowadays I am around 98% fluent to the point where it goes undetected. Because I stutter alone, I have had an insane amount of opportunities to study myself becoming the most extensive stuttering case study where I studied over ~40,000 speech blocks trying to figure out what the cause of stuttering is. I realized that the mouth positioning is off in relation to the timing of the brain's intent to speak. This is where people from SSG took issue with calling it an unproven or unorthodox method which accelerated the breaking away from SSG. Not to mention there's a lot of defeatist mentality there because they were unable to fix their own speech impediments and use the coping mechanism by saying that stuttering is genetic and there's nothing you can do other than accept that you have stuttering. We greatly disagree with this coping mechanism where stuttering is entirely learned and not genetic as it is impossible for a technique to be able to override/change your current genetic makeup to the point where you go almost entirely fluent. In addition I was able to amass 150 subscribers in just 2 videos where those two videos in total got 10,000+ views, although those have since been private because I value serious content over entertaining content (more academic videos explaining different topics related to stuttering over stuttering in front of people online to show that stuttering isn't so scary). From the beginning we have had the originals such as Furqan, Book and RJ that have stayed with us for years. Ibz joined shortly after and then more notable members such as Craig Coffee. We continued to grow in numbers getting even more notable members such as Samwill and Ahmed who often spread the word of Abrahamic religion as well as the mysterious force that is Javier. We continue to grow because our mission is to help as many people as humanly possible to do humanity a service. It is much more efficient to address the cause of stuttering directly to get much more efficient results compared to focusing on correlations to get passive results. This was a big step because there are so many correlations out there when it comes to stuttering that I removed them one by one to figure out the direct cause. Stutterers tend to take the wrong approach which is why they have inconsistent results since they try to stop stuttering by focusing on a correlation. This is why a stutterer can work for years and they still don't get anywhere or they barely get anywhere. They are too focused on a byproduct of a hard block for example or the hard block itself when the focus should be shifted to before the hard block because the cause comes before the hard block. So when someone tries to fix their continuous exhalation, they don't realize that the hard block is what causes a disruption of the exhalation so fixing the hard block stops the disruption of the exhalation not trying to fix the disruption of the exhalation to try to stop the hard block the swaps get swapped thus leading to barely any progress. I'm sure you understand by this point as to why it is important for us to figure out how to stop stuttering and the amount of effort that it took to get here. Not to mention the number of benefits is too much such as improved social life, dating life, public speaking skills, higher chances of getting hired and so on. Communication skills is one of the most important skills that you can have and stuttering is able to force you into introversion if you aren't able to speak. Also not to mention stuttering can lead to getting socially rejected, feeling embarrassed, feeling anxious, can induce panic attacks, can even make you feel depressed. All of these are motivating reasons to fixing your stuttering. But then we realized something, we had already accomplished the original goal of figuring everything out about what both stuttering and selective mutism are and how to stop these speech impediments. There were other primary goals that we wanted to address. Simultaneously to me self-experimenting to figure out how to stop stuttering, I was also engaging in both supervised and unsupervised neuroscience research try to address other big problems that someone can have such as fear (before a hypothetical bad outcome), negative emotions (after a bad outcome), depression (losing hope/meaning in life, seemingly impossible to prevent a bad outcome), OCD (having to perform a ritual to avoid a bad outcome), and so on. There are many other psychological problems that someone can have that we address but we of course never give medical advice we do not try to change or influence your decision-making on the matter. Because the theory and applications for these various psychological problems have been figured out and documented, we do not always talk about just these topics. Throughout our history we engage in productive discussions when it comes to academic subjects such as the philosophy of mind and what the nature of reality is, the monotheistic religions and so on. We also engage in debating to get our views challenged so that we either strengthen our views, readjust or even change views. We learn to debate without bias by seeking the truth as the main desire that drives the conversation rather than trying to use evidence to argue to try to defend something you want to be true.</p></div></div><div class="se-hero-section-block"><h2 class="se-hero-section-title">Our Eras</h2><p class="se-hero-section-body">Individualism is when you act on desire with the intention to only benefit yourself. Individuality is when you act on a desire with the intention to benefit the collective that being the Stuttering Empire. The list of different Eras have to do with individuals that acted on the bettering of the collective that being SE.<br><br>Demented&#8217;s lead against the breakaway of SSG (starting in late 2022)<br><br>Book&#8217;s massive spread of paranoia (throughout 2022 and 2023)<br><br>Craig Coffee&#8217;s stuttering video production and event hosting (throughout 2023)<br><br>Matejko&#8217;s false flag operation (late 2023)<br><br>Dragon&#8217;s spiritual crusade (throughout 2024)<br><br>Radius&#8217; VC-title reign of 330+ days (early 2024 - early 2025)<br><br>Demented and Pell unintentionally sparking a massive conflict versus SA leading to the shut down of SA with over 100,000 members in 2024 leading to 30+ members</p></div></div><div class="se-hero-section-block"><h2 class="se-hero-section-title">Our Ideology</h2><p class="se-hero-section-body">We focus more on the collective rather than the individual. We focus more on cooperation rather than competition. We are stronger together than apart. These are the core values that have united us. Instead of highlighting individual achievements, we highlight the achievements of the collective as a whole. We recognize that people have different knowledge bases so they are able to contribute differently contributing to the whole. Anyone and everyone is able to make a difference here. With that being said, we have already done what we were set out to accomplish. We have already figured out how to beat stuttering. We have already figured out how to beat anxiety. There are so many more problems that someone can experience that we have already solved using brute-force + analysis, reverse engineering, correlation vs. causation and the means of attrition. These are primary goals that have been achieved. What follows is to satisfy an obligation to society by sharing the knowledge that we have discovered here with as many people as possible. This doesn't imply recruitment into SE per se but to be able to explain to others how to stop these problems without giving medical advice or asking for medical history of course. Additionally being able to teach people how to problem solve to get to the right solution is important for optimization sake so that people do not limit their own progress. With that being said, we will continue to slightly refine our solutions if needed. We will continue to explore other topics of interest as we always have been to expand our knowledge base. We retain our name for historical and reformist purposes.</p></div></div>`;
+
+      for(let pt=0;pt<18;pt++){const dot=document.createElement('div');dot.className='se-particle';dot.style.left=Math.random()*100+'%';dot.style.top=Math.random()*100+'%';dot.style.animationDelay=Math.random()*20+'s';dot.style.animationDuration=(14+Math.random()*10)+'s';page.appendChild(dot);}
+
+    }else if(section.isRules){
+      page.innerHTML=`<div class="se-hero-page-wrapper no-links"><div class="se-hero-section-block"><h2 class="se-hero-section-title">Rules</h2><p class="se-hero-section-body">Instead of viewing yourself as an individual, view yourself as part of the collective. I want you to think whether or not it is a good idea to do something but not relative to you but relative to others. We expect you to be smart enough to understand the objectivity behind conducting yourself in an appropriate manner.</p><br><br><p class="se-hero-section-body">I. Do not engage in doxxing or harassment.<br>II. Do not distribute malware or viruses.<br>III. Do not engage in phishing, spoofing or scamming.<br>IV. Do not share content depicting violence or self-harm.<br>V. Do not share content depicting threats of violence.<br>VI. Do not share content depicting extremism.<br>VII. Do not share content depicting nudity or sexual acts.<br>VIII. Do not share content depicting hate speech or discrimination.<br>IX. Do not share content depicting impersonation.<br>X. Do not share content depicting substance abuse.<br>XI. Follow Discord\u2019s Terms of Service at all times.</p></div></div>`;
+
+    }else if(section.isMembersList){
+      page.innerHTML=`<div class="se-hero-page-wrapper no-links"><div class="se-hero-section-block"><h2 class="se-hero-section-title">Members List</h2><table class="se-members-table"><thead><tr><th>Rank</th><th>Members</th></tr></thead><tbody>
+<tr class="se-rank-founder"><td>THE COLLECTIVE<span class="role-desc">We are all equal.</span></td><td id="se-collective-names">Aangvibez, DuoPlays, iRock, Pookie, Wizzrobe, Deathbird, Rivon, Javier, Scharfschutze, Aroma, Polka, StingRay, Wes, Pierce, GROMICTTJT, Metallicaism, Demented, Troof, Shammy, Mr. Time, Geoxcaliber, Bakat, Rejector, Genji, Ibz, CodeFender, Charles Bronson, Muslim_soldier101, Articc, Gamma, Zgatavelli, Jonathan, LiLy, RJ, Iamskallia, Kyao Ackerman, Askeladd, C++ dev, Johnny, Pandy, Greentea, Tina Suika, AceMontana, Gurpreet, Venuma, Akuma, Foxxo Bean, Solgrem, Afk, Programatik, Danny, Attics, Reaexe, Lulu, Au&szlig;erirdische, John Wick, Bezhan, Merijn, Thedoc, Hugag, Julian, Vishal, Faith, Goldninja, Ilyas, Bilal, Damien, Saiyad, Book, Godvaluebased, VickyTheBoss, ScythianPunjabi, Eli Cohen, Remii, Huck, Manic pothos, Transcendental, Agnette, Shani, Luna, Arman, MoralMoriarty, Bahrami, Cultus The Ghoul, Phyllis, Pro settings, Null, Nafi, MangoMan, Zorkie, Clutcher, Lupin, Mendeleev, Lucien, OctaneWeasel, Hemlock, Livlight, Lils, Hammy, Proton, Daves Fantasy, Mellman, Vickyy, Ellli, FLUENTling, Belladonna, Heli, Chromegraves, Chubaka, Kabir Singh, Kii, Phythos, Pell, Orange, Elad, Askeladd, Danish, Furiten, Ndog, Imaginator, Mr. Jay, Marwa, Bagel, Safi, Fropy, Matejko, Sam5524, Vannie, YamiBean, Death, Unnati Doshi, Yoshologist, SmolShu, Desenuts, Warren, Marselol, Furqan, Axtro, Logie, FindTheCenter, Kafka, Xavier, BIrdy, Lucidarior, Rajdeep Singh, Automattion, Man Searching For Meaning, Grimes, Samwill, Joker, Kiriku, Amuro, Someone, Warpious, Reaper, Chilli, AB7, Avatar, Tacoman, Creamcheese, Nahuel, Nice Jewish boi, Iron, Storm, Mikel, Muz, Circle</td></tr>
+</tbody></table></div></div>`;
+    }else if(section.isWallOfFame){
+      const profiles=wofMembers.map(m=>`<div class="se-wof-profile"><img class="se-wof-portrait" src="${m.img}" alt="${m.name}"><div class="se-wof-profile-info"><div class="se-wof-profile-name">${m.name}</div><p class="se-wof-profile-bio">${m.bio}</p></div></div>`).join('');
+      page.innerHTML=`<div class="se-hero-page-wrapper no-links"><div class="se-hero-section-block"><h2 class="se-hero-section-title">Wall of Fame</h2><div class="se-wof-list">${profiles}</div></div></div>`;
+
+    }else if(section.isIdeology){
+      page.innerHTML=`<div class="se-hero-page-wrapper no-links"><div class="se-hero-section-block"><h2 class="se-hero-section-title">Constitution</h2><p class="se-ideology-intro">We are fully committed to the continuation of the reinforcement and facilitation of the Stuttering Empire to help out as many people as possible to reduce various problems and consequently lead to their cessation.</p><div class="se-ideology-section"><div class="se-ideology-heading">Core Beliefs</div><p class="se-ideology-body">We assume that various neurological and psychological problems especially ones that we present are able to be fixed. We do not believe that anxiety, stuttering, OCD or depression (just to name a few examples) are genetically caused but rather environmentally caused therefore can be fixed by taking action in the environment that reshapes the brain. The reason is because limbic system firing is independent of your genetic makeup. There are vastly different genetic makeups out there but everyone has different firing of the limbic system during certain situations. The goal is to be able to reduce activity of the limbic system given a certain situation to be able to increase performance by not feeling mentally held back. We have already met this goal which is why we are passively refining the methodology if needed but we are fully confident by our solutions and approach.</p><br><p class="se-ideology-body">The reason why people may believe that such psychological conditions are genetic is because they do not understand the malleability of the brain or because they were not successful in finding a good solution to the problem. This is what gives us more than enough confidence that these problems are able to be successfully addressed. If it is an environmentally caused problem then the solution must also be environmental while the information is being fed back to the brain to create change.</p><br><p class="se-ideology-body">In addition, being able to produce consistent results leads to positive reinforcement which leads to changes to the belief system which leads to additional confidence in our ability to address such psychological problems. We do not give nor offer medical advice nor do we try to influence your medical decision-making.</p></div><div class="se-ideology-section"><div class="se-ideology-heading">Fundamentals</div><ul class="se-ideology-list"><li><span class="li-num">1.</span><span>You need to change the belief system to get motivation</span></li><li><span class="li-num">2.</span><span>But how do you even change the belief system? By positive reinforcement</span></li><li><span class="li-num">3.</span><span>This means that you think about your past successes which reshapes belief</span></li><li><span class="li-num">4.</span><span>Now you start believing you can achieve the reward (by fixing the problem)</span></li><li><span class="li-num">5.</span><span>This leads to more motivation to take actions in the environment</span></li><li><span class="li-num">6.</span><span>More motivation &#x2014;&#x2014;&gt; stronger drive &#x2014;&#x2014;&gt; more willingness to take action</span></li><li><span class="li-num">7.</span><span>Then the output gets re-inputted via the feedback loop and adjusts the belief system, the motivation level and the probability of you succeeding at achieving the reward (which is again to fix the problem)</span></li></ul><div class="se-ideology-eq"><span class="ch">New Information</span> = Old Information + Old Information</div><div class="se-ideology-chain"><span class="ch">Change the belief system</span> (prediction mechanism/policy)
+&#x2192; Increase motivation / more confidence / acceptance
+&#x2192; Action within the environment
+&#x2192; Reward
+&#x2192; Feedback loop
+&#x2192; Belief system changes + reward values change
+&#x2192; <span class="ch">New sought reward</span></div></div></div></div>`;
+
+    }else if(section.isMedia){
+      // Build an empty shell — iframes are injected lazily when the user navigates here
+      page.innerHTML=`<div class="se-hero-page-wrapper no-links"><div class="se-hero-section-block" style="padding:0;border:none;background:none;margin:0;"><div class="se-media-grid" id="se-media-grid-inner"></div></div></div>`;
+      page._mediaLoaded=false;
+      page._mediaIds=['uOu4YrnoBXA','MUB13or3TBg','NnWY0-iS6-w','vyNqWW4Vplc','H2YUj7N9y-o','AmTAZ6wSenE','32QTbKcP4CE','RYaRNJwna9Y','_B0sDpm1c24','_7Jq-WusSnk','E1o8zsL9C6k','rS3bcjI7QYw','c4GHx956-gI','xEsNfC3w1-o','PJZ3lD8czMo','HgPB6nHgARI'];
+
+    }else if(section.isAllies){
+      page.innerHTML=`<div class="se-hero-page-wrapper no-links"><div class="se-hero-section-block"><h2 class="se-hero-section-title">Alliances</h2><table class="se-allies-table"><thead><tr><th>Server Name</th><th>Founder</th><th>Theme</th><th>Creation Date</th><th>Invite Type</th></tr></thead><tbody><tr><td>LongHouse 2028</td><td>Samwill</td><td>Casual, religion, astrology</td><td>January 31st, 2024</td><td>Ask to join</td></tr><tr><td>Safety-Space of Spirituality</td><td>Amuro</td><td>Spirituality</td><td>June 16th, 2025</td><td>Ask to join</td></tr></tbody></table></div></div>`;
+
+    }else if(section.isAnxiety||section.isStuttering||section.isSelectiveMutism||section.isOCD||section.isTrauma||section.isDepression||section.isADHD||section.isInsomnia||section.isAddiction||section.isMeditation||section.isExposureTherapy||section.isCausality){
+      const academicContent={
+  isAnxiety:`<p class="se-hero-section-body">The brain works on probability and being able to avoid consequences (based on desire values). In other words if you desire an outcome (a reward) then the desire value is high. If you do not desire an outcome (a consequence) then the desire value is low. You can consider positive values to be rewards and negative values to be consequences. So for example a 5 would be a reward and a -5 would be a consequence. If the value is -1 or 0 or 1 that means great indifference towards an outcome occurring in the environment. If let's say you get a desire value of -30 then that would be highly consequential and you would greatly would want to avoid the outcome from taking place to begin with in the environment. This means the brain will send instruction to try to avoid an environmental consequence from taking place. The brain would send an instruction to take an action in the environment to avoid the consequence. Examples of this could be if you're out in the mountains and you encounter a mountain lion. The brain sees this as more than consequential because you want to avoid suffering and the more potential suffering there is (meaning you feel a lot of either mental or physical pain) then the more the brain would want to avoid it, thus the desire value being negative. On a slight tangent, I call it a desire value even when the number is negative because that means you desire avoiding an outcome. So the brain has to actively predict the probability whether or not a bad outcome is going to take place in the environment. This means that there are 2 approaches to anxiety (including other potential categories such as drinking alcohol that would be an example of brain flooding input). The first way is avoidance so this is when the brain asks you to take an action to increase the probability of avoiding a bad outcome and you decide to follow through so you accept the desire to act. This is to again reduce the probability of the bad outcome taking place. You can call this an avoidance behavior although slightly different to that of psychology. In this case avoidance is a good thing because you're taking proactive measures to avoiding a bad outcome. As a result anxiety is going to be greatly reduced because the brain doesn't believe that this bad outcome is going to happen (even if it did it would be a low enough probability that you wouldn't even feel anxiety). So the goal is to reduce the probability as much as possible. If you have exam anxiety and if you study for an exam that is going to greatly reduce the probability so thus you will feel more confident, you will have less hesitation and thus less anxiety as a result. The second way is through acceptance. This is when you realize that it's better to accept the outcome rather than to avoid the bad outcome, perhaps because you've been dealing with the problem for a long time such as trauma or because you don't believe it is possible anymore to avoid the outcome. This is done by declining the brain's request to act on a desire. So remember earlier we discussed how accepting the brain's request to act is to avoid a bad outcome, or at least try to. With acceptance we're doing the exact opposite. This is when you decline the brain's request to take an action in the environment. This forces the brain to confront the weakness thus you give yourself the opportunity to build new neural pathways. In terms of a conscious experience this may feel like mental suffering so for example you might feel a strong feeling of anger, sadness, or even happiness (such as winning the lottery and then later the pathways strengthen so the feeling of happiness goes away). So for example if you have social anxiety because you're afraid of people looking at you all you need to do is go outside and just be with the suffering since the brain adapts that way. Then that form of social anxiety goes away. If you have presentation anxiety the same thing can happen where you fear embarrassment so you put yourself in a situation where that's the case and the brain is forced to build new connections dealing with this particular outcome (of let's say people laughing at you). The point of meditation for example is to sit with suffering it is to be in suffering so that the brain adapts and you start thinking about these negative thoughts that much less. A negative thought arises and you think about it intentionally (non-reactivity - by allowing the thought to be there instead of reactivity where you try to distract yourself). Once again acceptance/non-reactivity is when you are with the thought to give the brain the opportunity to strengthen the pathways, to reinforce the pathways. Avoidance/reactivity is when you try to distract yourself of thought. Remember that all thoughts pertain to desires something that you want to happen whether it is to avoid or to accept an outcome. The brain takes the highest priority thought as the weakest reinforced pathway. So for example if you're at an airport you might have social anxiety because there are a lot of people around you but then the brain overrides it with the fear of flying because you're afraid of heights or afraid of a bad outcome when flying. So the brain overrides the current anxiety that being social anxiety with the weakest reinforced pathway that being flying. Then you think about it long enough and then you start to care a little less and you move onto thinking about something else. So these are the two main ways on how to address fear and they are the most natural and best ways on doing so. Now you may ask which one is better? I believe they are both good especially in combination but I will address the main tradeoff for choosing one over the other. Avoidance can lead to less anxiety and more confidence but the mental vulnerability remains. If you accept then you feel mental suffering at first but then the mental vulnerability goes away. This means that avoidance is easier but the mental vulnerability remains behind the scenes whereas acceptance is harder since you require the use of willpower which leads to the brain having to change so the mental vulnerability goes away. This is important to realize: Avoidance is the stopping of fear such as anticipation anxiety whereas acceptance is the stopping of negative emotions because the outcome happened after the fact. Now you may have a question: Is it possible to avoid and accept at the same time? The answer is yes but we need to be careful. The brain processes corresponding to each approach cannot happen at the same exact time. With that being said, you can most definitely actively avoid a bad outcome from taking place while accepting it. If you study for an exam you are decreasing the probability of the bad outcome taking place meaning the outcome of you failing the exam. But on the other hand if you intentionally think about failing the exam then the brain strengthens the neural connections for that outcome thus even if you were to fail you would not get emotionally affected. You are actively avoiding getting a bad grade on the exam by studying but at the same time if you were to fail you would already be mentally prepared for it due to again the strengthening of neural connections. In case you missed it, changing the belief system reduces anxiety and negative emotions. Avoidance and acceptance are both byproducts of changing belief and belief changes desire values. By belief that are two types. There is the belief in probability where you believe the chances of a bad outcome happening is low thus giving you more confidence. This type of belief system has already been addressed. I am talking about more abstract beliefs that can give you more confidence behind the scenes. If you believe that a cold shower isn't going to be that bad because other people take cold showers, now the value of the bad outcome (the discomfort) starts to reduce. The interpretation of this outcome starts to change for the better because now you don't see a cold shower as serious as you once did. There are many different belief systems that can change relating to various different outcomes so it really depends on what we're talking about. If you can change these abstract desires around then you are going to have less fear. Now of course this happens automatically in the environment when you gain experience doing things. If you have a lot of positive reinforcement then your beliefs start to change to your benefit. The problem however is that this doesn't always happen, as a matter of fact the belief system can be rather stubborn to change. This is why if you take time to mentally think about past experiences or learn from other peoples' experiences that can shape the belief system to give you more confidence that way. This belief system approach alone can give you a lot of confidence. Experience leads to change of interpretation which leads to change of mood because now the bad outcome is being interpreted as less negative thus giving you more confidence to act on something that would normally prevent you from acting upon.</p>`,
+  isStuttering:`<p class="se-hero-section-body">Stuttering is caused by a processing problem that occurs in the brain. This may sound complex but let me simplify it. The brain expects for a word to get said and it does not get said due to a reason/cause. We need to address what the cause is because there are many correlations that correlative with stuttering. After doing a lot of experimentation upon myself I reached a definite conclusion and that is that the brain is expecting the mouth (either the lips being pursed or the tongue positioning) is not in the right position relative to the brain's intent on attempting to say the word. First the brain has to send an instruction to move the mouth and then following the instruction to execute everything else that being to say the actual word (vocalization). You can watch videos of stutterers how they encounter either a stutter or a hard block (which is the same speech impediment known as stuttering just on opposite ends of the spectrum where hard blocks is on the more severe end) and you can notice how the mouth is not in the proper position. They will try to say the word but by that point the mouth can't even move because the brain is too focused on trying to say the word. This is a clear mistiming that needs to be addressed. The mouth has to move first before the intention to speak. This means that stuttering is not genetic as many people claim but is rather environmentally naturally learned the wrong way (similar to how some people naturally learn to handwrite better than others mainly out of lucky variables such as hand placement). The reason how I know stuttering is learned and not genetic is because it is impossible to have a speech technique override someone's genetic makeup to stop stuttering. Not only that but speaking is something you learn to do better so the more you train the better you get at it similar to studying Calculus you get better at differentiating and integrating functions. So the only thing that you need to do is to shape the mouth position before the intention to speak even arises. Now remember that you don't just shape the mouth to the first sound/letter of the word it's almost always going to be the first and second sound/letter of the word. For example if you want to say the word "the", believe it or not all three letters get set up at the same time to the point where you barely have to try saying it. The word "number" requires the first two letters to get set up. A word such as "example" only the first sound gets set up before trying to say the word. You need to focus on mouth first and then try to say the word after not the other way around or else you're going to mess things up. Think about it like a computer algorithm if you swap the steps around you get a completely different output thus an undesired output as a result. This will require conscious effort at first just like with anything else but when you get better at it, it becomes a lot more automatic to the point where you barely have to try and then it becomes completely natural since the brain processes it subconsciously (again this is happening in muscle-memory). How fast you progress depends on how effective you are. This means being able to understand the theory accurately and to be able to be driven enough to practice the application. The reason I was able to figure this out and create my own speech technique "mouth mechanics" in 2021 is because I stutter alone so I had a lot of opportunity to analyze my own speech blocks to try to figure out what the answer is. There are people who train their speech for years and have barely any results or not as good of a result as they would want because they hit a correlation. To be the most efficient you need to address the cause itself what comes before the hard block not during the hard block or after the hard block (such as byproducts - disrupted airflow being an example). If you try to fix the disrupted airflow it will not stop the block from happening because you're trying to address a byproduct not the cause of the hard block. The cause is again the mistiming of the mouth movement relative to the intent to speak. So this is why focusing on the cause is much more optimal than focusing on the correlation. Remember that a hard block is on the more severe end of the spectrum so that means that the mistiming is that much worse compared to a stutter (a repeated vocalization). Do you notice how the stutterer is trying to fight to reach something? You need to ask yourself what they're trying to reach. They're trying to reach a better mouth position. It does not matter what sound you have a harder time with and it doesn't matter what the sound is period this is able to be applied. This approach is proactive and not reactionary. Do not wait for the block to happen before trying to address it because by that point it would be too late. Rather prevent the block from happening to begin with. Imagine if you see a small crevice in the ground would you rather fall into the crevice having to try to get yourself back out or would you just walk around the crevice? In addition, there are a lot of advice out there that aren't good because they once again correlate with the problem. If someone tells you to do breathing exercises they're doing it because they mistook a correlation for the cause of the problem. Some people ask how fast would it take to progress. The more you practice in a shorter period of time the more you're going to progress compared to someone who is passively practicing. For example you have people that dedicate themselves for 6 months and they get up to a level B1 fluency in a language compared to someone who has studied the same language for years only to be level A2. So how fast you want to progress depends on your drive. So then the question is how do you get drive/motivation? To get more motivation you need to think of reasons for why something benefits you to begin with. If you want to get a better social life or to be a better public speaker or to talk to strangers or to make dating easier or to avoid feeling vulnerable in front of people then these reasons are going to increase the desire value of wanting to improve your fluency. You may be tempted to think that anxiety causes stuttering because the only reason you stutter is because you are outside socializing and that's the only time the problem arises. I can assure you this is not the case because I stutter even when I'm completely by myself in the complete absence of anxiety. There is the presentation phenomenon that took place during University where it would be impossible for me to stutter when I had presentations. This means that fear correlates because fear can either make you or break you. Fear can make you look your best and other times fear can make someone look their worst. So this is how I know that fear only correlates with the problem. This means that as long as you focus on the cause that being addressing the mouth positioning relative to the intent to speak then you can have as much fear as you want and it's not going to matter you're not going to stutter. So you don't even need to worry about addressing/stopping fear. Now if you do want to stop fear then there is a whole section on that where you can read how to stop it if you believe it will make you feel more comfortable when speaking without feeling that mental pressure.</p>`,
+  isSelectiveMutism:`<p class="se-hero-section-body">We addressed earlier how fear is not the cause of stuttering. Fear correlates with stuttering and is not the cause of stuttering. But what about selective mutism where you go mute when you're trying to talk? In this instance, fear is the direct cause of selective mutism. With stuttering you have the full intention to say the word outloud which is why you can hear vocalized repetitions or a hard block these are evidences of a strong intent to speak. Selective mutism is caused by fear because the intent to speak gets taken away from you entirely. If you want to be able to produce speech you need to have the intention. If you want to pick up a water bottle you need to have the intention. So no matter what you do you need to have an intention preceding the actual action taking place in the environment. The fear overrides the original intent to speak. So at first you go from a place of having the intent to speak to not having the intent to speak because now the brain is preoccupied with trying to address the fear. An example of selective mutism is when someone is speaking to someone else in a voice call. Then out of nowhere they get a thought that the listener is bored and this thought starts to overwhelm them. The original intent to speak gets overridden with a new intent and that's to avoid the listener from being bored. This may disrupt your ability to speak if not entirely make you go mute. The way to address this problem is by stopping the fear itself. Read the anxiety section above to know how to stop the fear. In other words if you get a thought in your head that the person is being bored to the point where you go entirely mute then it's more optimal to stop the fear before the fear even arises to begin with (it's hard to address the fear in real-time this is why a preventative approach is much better than a reactionary approach). The way on how to stop the fear is through exposure therapy by reinforcing the same input over and over again until the brain is forced to create neural adaptations thus the brain makes change and you think about this thought that much less. This means that the thought is being thought of that much less because of exposure so you stop caring whether or not someone finds you boring. Remember that the more you think about a thought the more the brain adapts so the brain starts to care less as a result.</p>`,
+  isOCD:`<p class="se-hero-section-body">This is also going to be the same explanation to that of anxiety but only 1/2 of the explanation (which means you have to read less). This is where you practice acceptance instead of avoidance (look back at the anxiety section). Do not get confused even though anxiety and OCD are different sections the solution is the same. Avoidance fuels the problem of OCD because you rob yourself of the opportunity to create new neural pathways. Let's say someone has severe OCD where the brain asks them to wash their hands continuously. If you accept the brain's request to wash your hands, meaning you wash your hands, then you are fueling the cycle of suffering so you only continue to fuel the cycle of OCD. To not fuel the cycle of OCD you need to decline the brain's request to perform the action. The brain asks you to wash your hands so you instead decline and do not wash your hands. At first this is going to cause mental suffering because now you are forced to face the bad outcome of having your hands dirtier than before. The more mental suffering you feel the more progress you make because now you give the brain the opportunity to adapt by strengthening neural connections. So this is how to stop the cycle of suffering that is OCD. You rely on acceptance instead of avoidance. Magical thinking is a more severe form of OCD as this is an OCD-variant but has the same solution. The brain asks you to perform a ritual because it predicts that if you do not perform the ritual then the bad outcome is going to take place. This feeling is able to be strong to the point where you feel forced to flick light switch on exactly 6x in a row to avoid the bad outcome from taking place. Magical thinking can occur throughout hundreds of times per day. So the way to stop this problem is by once again declining the brain's request to perform the ritual. If the brain asks you to perform a ritual you decline thus this forces changes to the brain. The brain is now forced to confront the bad outcome it once sought to avoid because it is no longer trying to avoid the bad outcome (by not taking an action).</p>`,
+  isTrauma:`<p class="se-hero-section-body">The solution is the same as anxiety but being able to do it is the hard part thus making trauma much more difficult to solve. There are two ways on overcoming trauma and believe it or not it's the same answer as the anxiety/negative emotions section. Let me tell you exactly why that is. When a bad outcome happened to you back then, you think about it over and over again. You can't stop ruminating about that particular outcome. You then have to ask yourself how you can stop thinking about this outcome. There are two ways on addressing trauma. You either use avoidance or acceptance. By avoidance I mean you convince yourself through reasons in the past that the bad outcome went to your favor. You think about the situation many times to the point where you analyze and convince yourself that it went to your favor. An example would if you had a confrontation with someone and at first you believed they made you look bad in front of everyone but then looking bad at it you didn't look as bad as you once thought. Maybe the guy was a bully who you really did not want to lose the confrontation against. The trauma goes away because you realize that you either had a neutral response or a response that made you look good instead of backing away. If you had a response that made you look bad in front of everyone meaning you caved to the bully then this can be trauma that stays with you for years because he beat you mentally and made you look bad and in his mind he's better than you. If you beat him then you wouldn't even have trauma. This is what avoidance means when you think of reasons for why you won in a particular situation rather than lose (it's not a distraction because the reasons are realistic by using evidence from the environment in your mind to reshape how you view the situation). The problem with avoidance is that there are a lot of traumatic situations where this isn't possible, meaning that you clearly lost not necessarily because of ego per se but rather in terms of a bad outcome that took place meaning it didn't go your way and you really wanted it to. You never wanted it to happen to begin with or for it to have gone your way (and again if it went your way there is no trauma). Then by that time you're forced to do the only other option and that is to accept. This is why trauma is so difficult to deal with because you're forced to deal with the outcome because it already happened. This means that you cannot go back in time to try to either avoid or correct the outcome altogether which is why you spend so much time trying to avoid the outcome in your mind by trying to convince yourself that it went your way or that it wasn't as bad as it could have been or that it wasn't all that bad in the first place. You try to convince or distract yourself that the bad outcome wasn't as bad and all of these are examples of avoidance because you're not confronting the bad outcome directly. So this is why trauma is so hard to deal with. You are forced to confront the bad outcome. You are forced to accept it unless if you want to continue the cycle of suffering that is avoidance. The reason why people naturally try to avoid is because avoidance makes you feel better in the moment but the mental vulnerability is there behind the scenes because only acceptance can stop the mental vulnerability. The reason this is the case is because avoidance does not allow for the brain to strengthen neural pathways compared to acceptance (unless if you are forced into a situation that you didn't want to be then by that point growth is forced upon you - doesn't always necessarily lead to trauma). So what I am trying to say is the best way to deal with trauma is acceptance as hard as that may be. You need to expose yourself to the bad outcome in your mind and just tell yourself that it didn't go your way in other words you need to accept that you wish it never happened but it did happen. This is why accountability is so difficult to do for someone in the workplace for example if they messed up and they try to blame it on someone else that's avoidance and not acceptance (this isn't about trauma but it's the same logic - the point is that everything that's being said about trauma applies to the real world it's just nowhere near as severe as trauma is because weak neural pathways are not as exposed as they are in trauma). So you need to strengthen the weak pathways by acceptance. You need to accept the bad outcome instead of trying to mentally avoid it or fight it. Avoidance does not lead to the strengthening of weak pathways only acceptance does that's why avoidance does not create stronger pathways only acceptance does. The trade off is that avoidance provides relief but the problem (which are again weak pathways) still exist behind the scenes whereas with acceptance you feel that initial suffering and then later you feel better. And once again I'm not saying trauma is easy to deal with obviously it's more than difficult to deal with but this is how to do it. Once you understand what to do addressing trauma becomes easier. Acceptance is mental exposure therapy where you just tell yourself that the bad outcome happened and there's no changing it.</p>`,
+  isDepression:`<p class="se-hero-section-body">Depression can be caused in multiple different ways. The first way is that someone really wants to learn to avoid a bad outcome from taking place because it's going to greatly better their life but they realize that they can't. This alone can make them feel depressed because it means they're forced to accept the bad outcome. An example is if someone stutters so badly where their entire quality of life gets destroyed. They might see it as a desperate situation where they have to fix stuttering or else their quality of life is going to continue being significantly reduced. In other words they have to stop the problem using avoidance it's not something they're willing to accept. So there's two ways how to address this particular cause of depression. It's the same explanation in the anxiety section. Either think of more solutions on how to stop the desperately bad outcome you want to avoid or you need to force to accept that your life is going to be of lower quality compared to most other people which is very hard to do but is still possible. For avoidance you need to think of solutions to the problem (because again this is avoidance - keep in mind avoidance is a good thing). So then you come on here and feel less depressed because now the brain interprets a much lower probability of you having stuttering for a longer time thus you feel better. The other cause for depression is when you lose meaning in life you feel as if you don't have a purpose for existing. This solution is rather easy you just need to find more meaning you need to find a purpose you need to think of goals that you want to address to get you out of this nihilistic mindset. I'll give you another example of a common cause of depression commonly amongst men. If a guy has a hard time getting girls he starts feeling convinced that he will never find love and this can cause depression so the answer is the same to find solutions to improve his good looks or of that sort. No matter what the bad outcome is (such as believing you will never find love or that you cannot avoid some other desperately bad outcome) you need to continue to seek possible solutions to decrease belief that this bad outcome is unavoidable.</p>`,
+  isADHD:`<p class="se-hero-section-body">The most staple symptom of ADHD is having a short-attention span. There are other symptoms of ADHD but this is the most common one where someone is unable to stay focused with performing a task. The way how to stop this is by being more motivated. So I already addressed this in the anxiety section as it is detailed. You become more driven by thinking about reasons that can help benefit you to do the particular task. If you believe that studying is going to increase the probability of passing an exam then you are going to study. This is also why procrastinators have much higher motivation near the end of the deadline because the chances of the consequence happening is greater. So this means that the individual is going to have more motivation. I had a professor who had ADHD and he would have the best attention span when teaching the class because he found it interesting. So not only can feeling motivation for doing something lower ADHD but taking interest in something also lowers ADHD because you find it interesting so you do it without even thinking. Another strong option that you can do to increase focus is 1-object meditation where you continuously redirect your focus onto that object no matter the distraction. Catch yourself drifting away from the object and continue to redirect attention onto it to reach a deep state of concentration. This is going to require a lot of willpower.</p>`,
+  isInsomnia:`<p class="se-hero-section-body">This is caused by anxiety. Let's say you're about to fall asleep but your mind is rushing because you're afraid of a consequence happening the next day. Let's say you have presentation anxiety and that's what causes you to be unable to fall asleep because you're worrying about it too much. Well there you go that is the answer. Fear is what causes insomnia. If you want to stop overthinking you need to read the fear section. Either avoidance or acceptance (or both) is applicable here as solutions.</p>`,
+  isAddiction:`<p class="se-hero-section-body">We know that are things that you can do to make the stopping of addiction more effective. You can isolate yourself from the addiction in question such as by stopping purchasing of it or just not being around it at all. If you have a vanilla cake in your fridge after some time you're going to be tempted. If the cake wasn't there in the first place the temptation isn't as bad. So if you're able to stop being around said addiction it makes it a little easier by default to overcome the addiction. This means you make no plans to obtaining whatever you're addicted to and not to have said addiction anywhere near your vicinity. I believe distracting yourself is good when you take your mind off of the addiction by doing other things. If you just sit around all day thinking about the addiction and how much you crave it it's only going to make it worse compared to if you distract yourself as the distraction is taking place the pathways of the addiction are slowly going to weaken. The less you think about it the easier it gets. It's not a good idea to find a similar alternative to the addiction because that's only going to make you think about the actual addiction that much more and it's going to make you crave it that much more. In addition you can also change your belief system around by finding reasons why you shouldn't do the addiction altogether. If you have strong reasons for not doing something that's going to motivate you into stopping. Maybe you're interested in going to school and it would be in your best interest not to get addicted or else it might mess up with your ability to think. Ultimately, the way to stop addiction is by doing acceptance. This means that you accept that you're not going to have the addiction so that's when you start getting withdrawal symptoms and you want to take action in the environment to try to obtain the addiction but you use willpower not to. This is going to be hard at first but it's addiction we're talking about at the end of the day it's going to require willpower. The more you stay with the withdrawal symptoms and don't cave that's when you force the brain to change. When you get put in different conditions the brain is forced to make adaptations. Then after some time the withdrawal symptoms go away, then they come back, then they go away, then they come back again. Keep doing this until the withdrawal symptoms go away entirely (you don't need to chase perfection even if they go away by 95% that means you're no longer addicted - we all have various temptations from time to time). By this point the brain has adapted so much to not getting the addiction that it no longer takes the action to try to obtain it because the pathways have been strengthened in the other direction - by not getting the addiction. This means the craving gets reduced. I'll give you another example of how willpower can help you not when it comes to addiction but the logic is the same. If you take a cold shower at first it's going to be discomforting but the more you use willpower to stay in the cold shower the easier it's going to become to the point where you start experiencing both physiological and psychological changes where you go from feeling cold to warmer. This is the same for addiction at first you're going to have serious withdrawal symptoms that are more than difficult to deal with because of how strong the craving is, then you use willpower (which arises by having strong reasons to go against your addiction in the first place) by going through the withdrawal symptoms to the point where you feel suffering which is good because suffering is evidence that change is taking place. This is how to overcome addiction at a fundamental and applicatory level.</p>`,
+  isMeditation:`<p class="se-hero-section-body">There are many types of meditations out there. There is the input flooding approach also known as 1-object meditation also known as Jhana meditation where you re-focus on the same object, whether mental or physical, no matter what. If you become distracted you continue to refocus on that object. Other people focus to turn their awareness back onto itself, in other words to be aware of awareness. There are quite a few input flooding approaches and in my opinion this is a flawed way of going about meditation and here's why. First of all you would need to do this intensely meaning this is an active way of meditation which requires a lot more effort. Not only that but the effects are short-lived, only lasting for 0-3 hours before you have to do it again. This is why people need to continuously and everyday to this to try to achieve results. The effort is just not worth it, not to mention meditation is supposed to be rather effortless. And no just because you master 1-object meditation doesn't meant make it any easier because it's a continuous effort where you re-direct your attention and focus. Now there is no doubt that it can help you with achieving a deep state of concentration also known as Samadhi, but if we're talking about reducing anxiety and achieving mental strength there is a much better way of going about it instead of doing input flooding meditation. Also before I continue I want to say one thing, the reason I call it input flooding meditation is because the brain receives the same input over and over again to the point where even if you do start thinking something negative the brain naturally wants to go back to that object that you were concentrating on for a longer period of time. Then the pathways become weaker after 0-3 hours and then that distraction no longer works. But see this is what the problem is. Input flooding meditation distracts you which means that the underlying mental vulnerability is not being addressed because by distracting yourself you are actively avoiding the outcome. The better way and in my opinion the most optimal way of going about meditation is by doing exposure therapy. Now you might laugh at first but I do consider the applied neuroscience way of meditation and exposure therapy to be one and the same and here's why. This is a more passive version of exposure therapy because you meditate on your own thoughts but you can also do it more proactively throughout the day. All you need to do is when a thought arises for you to make the decision not to take an action, whether mental or physical. This is also known as non-reactive meditation. So in other words, if an OCD thought asks you to wash your hands, clearly the outcome trying to be prevented is to have dirty hands. So what you do is you deny the brain's request to wash your hands so now the brain is forced to accept the outcome of having dirty hands. Now you don't always need to accept every single outcome but it's good to get into the practice of doing so (to have a balance between avoidance and acceptance). Another example if I make a typo when sending a message I really have the strong urge to edit the typo because I'm not used to seeing myself making typos. But if I decide not to take an action and leave the typo where it is, the brain starts adapting. I do not follow the urge and rather give the brain the opportunity to adapt, to build stronger neural pathways towards seeing yourself making a typo. I hope you understand what I'm saying by this point, that acceptance is how you do meditation the right way. You deny falling into the temptation of the urge that the brain is asking you to do (remember an urge is the feeling of wanting to act) which forces the brain to change because now the brain realizes that the outcome it wants to avoid is not going to be avoided. So this is why do-nothing/non-reaction meditation is so effective because you train yourself not to react to every thought whether mentally or physically having to do something. Use thoughts such as negative thinking or OCD to your advantage. This makes meditation a lot more passive and effective which requires a lot less effort. You get into the habit of doing this throughout the day and not just during a dedicated meditation time. This means that you are now optimizing meditation because you can do it throughout the day so you can reap the rewards of doing it consistently throughout the day instead of during a dedicated meditation time because then the effects are going to go away faster. Having a balance between avoidance and acceptance is a good thing and both are more practical depending on the situation. Acceptance comes after an outcome happens, so after the fact. Before the fact it's usually going to be avoidance but you can also do acceptance before the fact. If you are studying for an exam that's avoidance because you are actively trying to about a bad outcome of failure but you can also accept failure by thinking about that outcome (expecting that outcome to take place). So this is how you can practice both avoidance and acceptance before the outcome, before you even take the test. After the fact it's always going to be acceptance which is why no matter what to reduce negative emotions it's always going to come down to acceptance - you can't avoid something that's already happened. You can't go back in time to avoid an already occurred outcome. In order to do this more applied neuroscience way of meditating which I like to call acceptance meditation which others call non-reactive/do-nothing meditation, just set the intention to not follow the brain's urge to react to thought. This is going to put you into the habit of not reacting as much even if you go outside into the real world. You're not going to feel the need to follow the brain's urge to react to thoughts. Do not worry about getting rid of desire/intention as that is impossible. You will never be able to stop desire because even trying to stop desire is a desire. Do not try to stop thought either because if you do have a significant reduction of self-referential thinking (caused by the default mode network) that is going to be a byproduct of non-reactive/acceptance meditation and not so much due to the intention itself of trying to stop thought. So once again to meditate naturally throughout the day when a thought arises take the decision to not take the action to try to satisfy the thought. Remember that a thought is a request to take action in the environment, so if you do decide not to take action in the environment that leads to acceptance because the outcome that you wanted to avoid is no longer being avoided thus forces change to the brain.</p>`,
+  isExposureTherapy:`<p class="se-hero-section-body">The brain is always going to ask you to do things throughout the day. In other words, the brain is always going to ask you to take action. You might get asked to shower, to eat food, drink water, you get instructed to perform thousands of actions throughout the day. Any action that you take is called avoidance. This is why avoidance is not a bad thing. The reason why this is called avoidance is because you take an action to avoid a worse outcome from taking place. For example, if you are walking outside and you notice how the same person is following you across a distance, you start feeling fear. This is a normal feeling to have. You then decide to take actions to avoid an even worse outcome from happening. It's not just being followed that's scary but it's because your brain defaults to thinking about an even worse outcome taking place such as getting physically harmed. The brain then asks you to change directions or to go where there's more people around to feel more secure. There is nothing wrong with taking actions to prevent bad outcomes from taking place in the environment. There is no problem with doing avoidance especially due to how practical it is. But there's a problem - doing only avoidance is going to lead to mental vulnerability and is going to exacerbate mental weakness. Now at first this might not make sense. If avoidance benefits you, then why would it also harm you in the process? The reason is because avoidance prevents the brain from adapting to outcome. You are actively running away from a bad outcome taking place. This means the brain does not have the opportunity to reinforce those pathways associated with the bad outcome itself thus is going to keep the mental vulnerability behind the scenes. If you are being followed and you decide to move in the direction of danger, you start to feel more mental suffering which is when the brain starts to adapt by strengthening neural pathways. Now obviously don't do this for this particular example because as we discussed avoidance is more practical for this particular situation. But there are going to be many situations where avoidance is not going to help you. As a matter of fact, any outcome that happened in the past is no longer able to be avoided which means the only other option is acceptance where you have to accept that the outcome had already taken place, especially if it's an undesirable outcome. Avoidance and acceptance are in complete opposite ends of each other. Avoidance is when you take an action in the environment to prevent a bad outcome from taking place. Acceptance is when you do not take an action in the environment to try to prevent a bad outcome from taking place. This means that if you do not take an action then that forces the brain to create adaptations because now it sees the outcome as unavoidable, whether it's because you have no control over the situation or because you voluntarily make the outcome unavoidable. Avoidance leads to immediate relief and more confidence, but the mental vulnerability remains. Acceptance on the other hand you have to feel suffering first but the trade-off is the mental vulnerability gets reduced and can even go away depending on how much the pathways have been strengthened. So once again, avoidance does not lead to the strengthening of neural pathways whereas acceptance does which is why you do not feel as much anxiety when you are actively avoiding something (although you may still feel a lot of anxiety behind the scenes if the way in which you're trying to avoid the bad outcome is not that effective OR if the outcome has not been accepted). This is why some people tell you to move towards than away because if you move away that's avoidance and that prevents change compared to moving towards leads to change to the brain. Now keep in mind that you do not always move towards. You should seek equilibrium with both avoidance and acceptance. One will be better than the other depending on the situation. With all that being said, do not get confused when people throw around 'cognitive behavioral therapy' around. Cognitive behavioral therapy is the same thing as exposure therapy people just like to add unnecessary separations. Exposure therapy and CBT both lead to acceptance, they both say to expose yourself to the negative outcome either mentally or physically (not all the time of course because there will be times where directly exposing yourself is impractical). Thus, they are one and the same thing as they both lead to the strengthening of neural pathways. The only reason why anxiety even exists is because you're trying to control something. In the hypothetical near or far future within the hypothetical environment, you are trying to control something meaning you are try to actively avoid an outcome which automatically makes you avoidant (which again in this case is a good thing to be avoidant). Now because we are talking about exposure therapy/CBT, we know that this is a method of acceptance not avoidance. Now you still can avoid an outcome while accepting it which is fine but most people avoid without accepting. When you move away from an outcome by taking an action in the environment you actively avoid it, by moving towards it you accept it. The way you move towards a bad outcome is by desiring to do so because you see some sort of benefit. Taking a cold shower is highly discomforting but if you move towards such an outcome then you feel better and the reason you take a cold shower in the first place is due to a desire, you have a belief that you are going to get benefit from it somehow. One note I do have to mention, you need to know what the fear even is to be able to address it using voluntary exposure therapy. Most of the time you will be able to know what the fear is but other times fear is going to not be as surface-level as you may think. So to be able to implement exposure therapy, to make it easier to implement that is, you need to do some introspection to know what the fear is. That's why I gave the example of if someone is following you, it's not so much of the following itself that makes you anxious but rather what could be a result of the following which is getting physically harmed. If you start hearing nuclear sirens that's also a result of getting physically harmed. Other ones will be more surface-level such as someone threatening to blackmail you now you're afraid of embarrassment or if you have a presentation and you're feeling nervous you're afraid of getting embarrassed. Not every fear traced back leads to physical harm other times it will be mental harm of some kind which is why both avoidance and acceptance is good because avoidance can lower the probability of the bad outcome taking place whereas acceptance doesn't care about probability and just reinforces the bad outcome altogether to remove the underlying mental vulnerability.</p>`,
+  isCausality:`<p class="se-hero-section-body">I see people running into this trap all the time including high-level neuroscience researchers. Someone chooses a faulty premise and they run with it to the point where they base the rest of their research on that faulty premise. In other words, the faulty premise is a correlation and not a causative variable to the problem they are trying to solve. Now before I give a detailed example I'm going to explain why you should care about this. It's not just about solving a problem it's about optimizing the solution itself. The reason why optimization is important is because you save yourself so much time and effort because you achieve efficient results. If someone is working with a correlation everything else is going to be flawed which is why stutterers for example spend years trying to fix their stutter and they can't because they are trying to use a technique that's based off of a correlation which not only slows their progress down but they will never fix their stuttering that way. This is why I worked hard to remove all correlations when it comes to all topics that I have addressed. A stutterer is going to notice that his exhalation is disrupted and is going to assume that disrupted exhalation is the cause to his stuttering even though it's a byproduct of the actual cause. They are going to do breathing exercises for who knows how long and they're going to expect that they're going to stop stuttering because they addressed the cause when no cause has been addressed. You should not focus on the byproducts of stuttering such as disrupted exhalation but rather what comes before the byproducts and what comes before the speech block itself, that being the cause itself. With that being said let's go to a detailed example regarding correlation vs. causation. In neuroscience research it is said that the default mode network (DMN) is responsible for self-referential thinking, meaning if you have higher DMN activity then you are going to have more anxiety which is true. Then they bring in a Buddhist monk that has meditated for a decade and they use fMRI scanning on his brain and they notice how there's a significant reduction in DMN activity. There is just one massive flaw. You have low DMN activity no matter what as long as you have no anxiety present (they did not introduce stressors when researching the monk's brain). This means that random individual can get thrown into the experiment and can get similar DMN activity regardless of how much experience they have meditating. This means that meditation correlates with low DMN activity, which effectively nullifies the research because then you can do anything such as playing a computer game and you can still have lower DMN activity. This is why people don't make progress or get the results that they want because they focus on correlations instead of the causative variable. You need to address the cause directly. This is why I used neuroscience to correct such a problem when it comes to meditation in its relation to DMN activity so that it does fix the flaw which is what I like to call acceptance meditation which I already explained in detail in the meditation section. I have spoken with so many meditators and a lot of them still have mental problems because they're meditating in a correlative way rather than addressing the cause, similar to how I said how stutters try to fix their stuttering using a correlative technique compared to my technique called mouth mechanics which addresses stuttering in a causative way. Now just one thing to keep in mind, I am not claiming originality when it comes to talking about meditation because there will be advanced meditators out there that don't even know neuroscience and just so happened to figure out how to meditate the right way due to a lot of trial-and-error. But most people are not those few individuals which is why it's good that I isolated the causative variable to be able to meditate effectively and to tell others how to meditate effectively. This is the power of optimization because you're optimizing your results by not having to use unnecessary time and energy trying to achieve meditative benefit. Not only that but you get saved a lot of time trying to go through the trial-and-error process to figure out which meditation works and which doesn't. There are so many different types of meditations out there that if you want to achieve low DMN activity it's going to be difficult which is why you would have to know what the best possible way to meditate is to truly achieve results. You need to remember that stuttering is the same way when someone tries out all sorts of different speech techniques hoping that one of them works. I hope you understand just how important correlation vs. causation is and why focusing on the causative variable is that much more important and optimal compared to working with correlations that trip you up in the process of achieving success.</p>`
+};
+const key=Object.keys(academicContent).find(k=>section[k]);
+const bodyContent=key?academicContent[key]:'<p class="se-hero-section-body">Content coming soon.</p>';
+const pageTitle=section.isAnxiety?'Anxiety, Negative Emotions':section.title;
+page.innerHTML=`<div class="se-hero-page-wrapper no-links"><div class="se-hero-section-block"><h2 class="se-hero-section-title">${pageTitle}</h2>${bodyContent}</div></div>`;
+
+    }else{
+      page.innerHTML=`<div class="se-hero-page-wrapper no-links"><div class="se-hero-section-block"><h2 class="se-hero-section-title">${section.title}</h2><p class="se-hero-section-body">${section.body||''}</p></div></div>`;
+    }
+    contentEl.appendChild(page);
+  });
+}
+
+/* ══════════════════════════════════════════
+   NAV PARTICLE CANVAS — active tab
+══════════════════════════════════════════ */
+let koActiveCanvas=null,koActiveAnimId=null;
+function koStopParticles(){if(koActiveAnimId){cancelAnimationFrame(koActiveAnimId);koActiveAnimId=null;}if(koActiveCanvas){koActiveCanvas.remove();koActiveCanvas=null;}}
+function koStartParticles(tab){
+  koStopParticles();
+  const cvs=document.createElement('canvas');cvs.className='tab-canvas';tab.appendChild(cvs);
+  koActiveCanvas=cvs;
+  const rect=tab.getBoundingClientRect();cvs.width=rect.width||240;cvs.height=rect.height||40;
+  const ctx=cvs.getContext('2d'),W=cvs.width,H=cvs.height;
+  const COUNT=38,pts=Array.from({length:COUNT},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*0.85,vy:(Math.random()-0.5)*0.85}));
+  function loop(){
+    ctx.fillStyle='rgba(4,4,13,0.15)';ctx.fillRect(0,0,W,H);
+    for(const p of pts){p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,2.2,0,Math.PI*2);ctx.fillStyle='rgba(162,0,0,0.88)';ctx.fill();}
+    koActiveAnimId=requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+/* Hover canvas per tab */
+function koAttachHoverCanvas(tab){
+  if(tab._hvCvs||tab.classList.contains('active'))return;
+  const cvs=document.createElement('canvas');cvs.className='tab-canvas';tab.appendChild(cvs);
+  const W=tab.offsetWidth||240,H=tab.offsetHeight||40;cvs.width=W;cvs.height=H;
+  const ctx=cvs.getContext('2d');
+  const pts=Array.from({length:30},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*1.2,vy:(Math.random()-0.5)*1.2}));
+  let raf;
+  function loop(){
+    ctx.fillStyle='rgba(4,4,13,0.18)';ctx.fillRect(0,0,W,H);
+    for(let i=0;i<pts.length;i++){const a=pts[i];a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>W)a.vx*=-1;if(a.y<0||a.y>H)a.vy*=-1;
+      for(let j=i+1;j<pts.length;j++){const b=pts[j],d=Math.hypot(a.x-b.x,a.y-b.y);if(d<70){ctx.strokeStyle=`rgba(162,0,0,${(1-d/70)*0.5})`;ctx.lineWidth=0.6;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
+      ctx.fillStyle='rgba(162,0,0,0.82)';ctx.beginPath();ctx.arc(a.x,a.y,1.8,0,Math.PI*2);ctx.fill();}
+    raf=requestAnimationFrame(loop);
+  }
+  loop();tab._hvCvs=cvs;tab._hvRaf=raf;
+}
+function koRemoveHoverCanvas(tab){if(tab._hvRaf)cancelAnimationFrame(tab._hvRaf);if(tab._hvCvs){tab._hvCvs.remove();tab._hvCvs=null;tab._hvRaf=null;}}
+
+
+/* ── RANDOMISE COLLECTIVE NAMES on Members List click ── */
+function randomiseCollective(){
+  const cell = document.getElementById('se-collective-names');
+  if(!cell) return;
+  const names = cell.textContent.split(', ');
+  for(let i=names.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [names[i],names[j]]=[names[j],names[i]];
+  }
+  cell.textContent = names.join(', ');
+}
+function koShowPage(index){
+  if(index===3) randomiseCollective();
+  document.querySelectorAll('.se-page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('se-page-'+index);
+  if(pg){
+    pg.classList.add('active');
+    window.scrollTo({top: 0, behavior:'smooth'});
+    // Lazy-inject media iframes only when user navigates to Media page
+    if(pg._mediaIds&&!pg._mediaLoaded){
+      pg._mediaLoaded=true;
+      const grid=pg.querySelector('#se-media-grid-inner');
+      if(grid){
+        grid.innerHTML=pg._mediaIds.map(id=>`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=1&loop=1&playlist=${id}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`).join('');
+      }
+    }
+    // Remove iframes when leaving Media page to stop background playback
+    if(!pg._mediaIds){
+      document.querySelectorAll('.se-page[class*="active"] #se-media-grid-inner, #se-media-grid-inner').forEach(g=>{
+        const parentPage=g.closest('.se-page');
+        if(parentPage&&!parentPage.classList.contains('active')&&parentPage._mediaLoaded){
+          g.innerHTML='';
+          parentPage._mediaLoaded=false;
+        }
+      });
+    }
+  }
+  document.querySelectorAll('.se-nav-tab').forEach(t=>{t.classList.remove('active');t.classList.remove('hovered');});
+  const activeTab=document.querySelector(`.se-nav-tab[data-index="${index}"]`);
+  if(activeTab){activeTab.classList.add('active');koStartParticles(activeTab);}else koStopParticles();
+}
+
+
+/* ══════════════════════════════════════════
+   BLUE FLAMING SWORD CURSOR
+══════════════════════════════════════════ */
+(function(){
+  const canvas=document.getElementById('sword-cursor');
+  canvas.style.pointerEvents='none';
+  const ctx=canvas.getContext('2d');
+  let mouseX=-999,mouseY=-999,swordActive=false,swordParticles=[];
+  const SIZE=60;
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;canvas.style.pointerEvents='none';}
+  resize();window.addEventListener('resize',resize);
+  window.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY;});
+  swordActive=true; canvas.style.opacity='1'; window.activateSwordCursor=function(){swordActive=true;canvas.style.opacity='1';};
+  function getSwordShape(cx,cy){
+    const bL=SIZE,bW=SIZE*0.15,gW=SIZE*0.6*0.80,hL=SIZE*0.35;
+    return{tip:{x:cx,y:cy-bL},bladeLeft:{x:cx-bW,y:cy-bL*0.4},bladeRight:{x:cx+bW,y:cy-bL*0.4},guardLeft:{x:cx-gW/2,y:cy},guardRight:{x:cx+gW/2,y:cy},guardCenter:{x:cx,y:cy},pommel:{x:cx,y:cy+hL}};
+  }
+  function drawSword(s){
+    // Outer wide glow (deep crimson halo)
+    ctx.strokeStyle='rgba(162,0,0,0.08)';ctx.lineWidth=14;ctx.beginPath();
+    ctx.moveTo(s.bladeLeft.x,s.bladeLeft.y);ctx.lineTo(s.tip.x,s.tip.y);
+    ctx.moveTo(s.bladeRight.x,s.bladeRight.y);ctx.lineTo(s.tip.x,s.tip.y);ctx.stroke();
+    // Mid glow
+    ctx.strokeStyle='rgba(162,0,0,0.18)';ctx.lineWidth=6;ctx.beginPath();
+    ctx.moveTo(s.bladeLeft.x,s.bladeLeft.y);ctx.lineTo(s.tip.x,s.tip.y);
+    ctx.moveTo(s.bladeRight.x,s.bladeRight.y);ctx.lineTo(s.tip.x,s.tip.y);ctx.stroke();
+    // Bright blade lines
+    ctx.strokeStyle='rgba(162,0,0,0.92)';ctx.lineWidth=1.5;ctx.beginPath();
+    ctx.moveTo(s.bladeLeft.x,s.bladeLeft.y);ctx.lineTo(s.tip.x,s.tip.y);
+    ctx.moveTo(s.bladeRight.x,s.bladeRight.y);ctx.lineTo(s.tip.x,s.tip.y);
+    ctx.moveTo(s.bladeLeft.x,s.bladeLeft.y);ctx.lineTo(s.bladeRight.x,s.bladeRight.y);
+    ctx.moveTo(s.guardCenter.x,s.guardCenter.y);ctx.lineTo((s.bladeLeft.x+s.bladeRight.x)/2,s.bladeLeft.y);
+    ctx.moveTo(s.guardLeft.x,s.guardLeft.y);ctx.lineTo(s.guardRight.x,s.guardRight.y);
+    ctx.moveTo(s.guardCenter.x,s.guardCenter.y);ctx.lineTo(s.pommel.x,s.pommel.y);
+    ctx.stroke();
+    // Tip glow bloom
+    const tipGrad=ctx.createRadialGradient(s.tip.x,s.tip.y,0,s.tip.x,s.tip.y,10);
+    tipGrad.addColorStop(0,'rgba(162,0,0,0.55)');
+    tipGrad.addColorStop(1,'rgba(162,0,0,0)');
+    ctx.fillStyle=tipGrad;ctx.beginPath();ctx.arc(s.tip.x,s.tip.y,10,0,Math.PI*2);ctx.fill();
+    // Pommel gem
+    ctx.fillStyle='rgba(162,0,0,0.95)';ctx.beginPath();ctx.arc(s.pommel.x,s.pommel.y,3,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(162,0,0,0.6)';ctx.lineWidth=1;ctx.stroke();
+  }
+  class SwordParticle{
+    constructor(x,y,strong){
+      this.x=x+(Math.random()*4-2);this.y=y+(Math.random()*4-2);
+      this.vx=Math.random()*0.8-0.4;this.vy=Math.random()*1.2+1.0;
+      if(strong){this.vy+=Math.random()*0.7+0.5;}
+      this.life=1;this.decay=strong?(Math.random()*0.015+0.02):(Math.random()*0.02+0.03);
+      this.size=strong?(Math.random()*4+5):(Math.random()*3+3);
+      this.wobble=Math.random()*0.05+0.05;this.wo=Math.random()*10000;this.frame=0;
+      this.type=Math.random(); // vary flame appearance
+    }
+    update(){this.frame++;this.x+=this.vx+Math.sin(this.frame*this.wobble+this.wo)*0.4;this.y-=Math.abs(this.vy);this.vy-=0.02;this.vx*=0.97;this.life-=this.decay;}
+    draw(){
+      if(this.life<=0)return;
+      const a=this.life,sz=this.size*a;
+      // Red flame: bright orange-red core → deep crimson outer glow
+      // Outer glow layer (dark crimson)
+      ctx.fillStyle=`rgba(162,0,0,${a*0.25})`;
+      ctx.beginPath();ctx.ellipse(this.x,this.y,sz*1.5,sz*1.9,0,0,Math.PI*2);ctx.fill();
+      // Mid layer (true red)
+      ctx.fillStyle=`rgba(162,0,0,${a*0.38})`;
+      ctx.beginPath();ctx.ellipse(this.x,this.y,sz,sz*1.3,0,0,Math.PI*2);ctx.fill();
+      // Inner core (deep #a20000)
+      if(a>0.4){
+        ctx.fillStyle=`rgba(162,0,0,${(a-0.4)*0.7})`;
+        ctx.beginPath();ctx.ellipse(this.x,this.y,sz*0.45,sz*0.55,0,0,Math.PI*2);ctx.fill();
+      }
+    }
+    isDead(){return this.life<=0;}
+  }
+  function spawnAlong(a,b,chance){for(let i=0;i<4;i++){const t=(i+0.5)/4,mx=a.x+(b.x-a.x)*t,my=a.y+(b.y-a.y)*t;if(Math.random()<chance)swordParticles.push(new SwordParticle(mx,my,false));}}
+  function swordLoop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(swordActive&&mouseX>-900){
+      const s=getSwordShape(mouseX,mouseY+SIZE*0.2);
+      drawSword(s);
+      spawnAlong(s.bladeLeft,s.tip,0.75);spawnAlong(s.bladeRight,s.tip,0.75);
+      for(let i=0;i<3;i++)swordParticles.push(new SwordParticle(s.tip.x,s.tip.y,true));
+      spawnAlong(s.guardLeft,s.guardRight,0.45);
+    }
+    swordParticles=swordParticles.filter(p=>!p.isDead());
+    for(const p of swordParticles){p.update();p.draw();}
+    requestAnimationFrame(swordLoop);
+  }
+  swordLoop();
+})();
+
+
+/* ══════════════════════════════════════════
+   RAIN FACTORY — vanilla canvas, no p5
+   (p5 sets overflow:hidden on body which breaks scrolling)
+══════════════════════════════════════════ */
+function makeRain(parentId){
+  const parent = document.getElementById(parentId);
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'display:block;width:100%;height:100%;pointer-events:none;';
+  parent.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  function resize(){
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  document.addEventListener('visibilitychange', function(){
+    canvas.style.visibility = document.hidden ? 'hidden' : 'visible';
+  });
+
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+  function lerpColor(t){
+    // interpolate between #6b0000 and #b50000
+    const r = Math.round(0x6b + t*(0xb5-0x6b));
+    return [r, 0, 0];
+  }
+
+  class Drop {
+    constructor(){ this.reset(true); }
+    reset(init){
+      this.x = rnd(0, canvas.width);
+      this.y = init ? rnd(-canvas.height, 0) : rnd(-200, -50);
+      this.len = rnd(12, 28);
+      this.speed = rnd(6, 12);
+      this.thickness = rnd(1, 2);
+      const [r,g,b] = lerpColor(Math.random());
+      this.r=r; this.g=g; this.b=b;
+    }
+    fall(splashes){
+      this.y += this.speed;
+      if(this.y > canvas.height){
+        const count = Math.floor(rnd(1,4));
+        for(let i=0;i<count;i++) splashes.push(new Splash(this.x, canvas.height));
+        this.reset(false);
+      }
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(${this.r},${this.g},${this.b},0.85)`;
+      ctx.lineWidth = this.thickness;
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.x, this.y + this.len);
+      ctx.stroke();
+    }
+  }
+
+  class Splash {
+    constructor(x,y){
+      this.x=x; this.y=y;
+      this.vx=rnd(-1.5,1.5); this.vy=rnd(-3,-1);
+      this.life=1; this.size=rnd(1,3);
+      const [r,g,b]=lerpColor(Math.random());
+      this.r=r; this.g=g; this.b=b;
+    }
+    update(){ this.x+=this.vx; this.y+=this.vy; this.vy+=0.25; this.life-=10/255; }
+    done(){ return this.life<=0; }
+    draw(){
+      ctx.beginPath();
+      ctx.fillStyle=`rgba(${this.r},${this.g},${this.b},${this.life})`;
+      ctx.ellipse(this.x,this.y,this.size,this.size,0,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  const drops=[], splashes=[];
+  for(let i=0;i<420;i++) drops.push(new Drop());
+
+  function loop(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(const d of drops){ d.fall(splashes); d.draw(); }
+    for(let i=splashes.length-1;i>=0;i--){
+      splashes[i].update(); splashes[i].draw();
+      if(splashes[i].done()) splashes.splice(i,1);
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+
+/* ── DIRECT SITE INIT (no splash) ── */
+document.addEventListener('DOMContentLoaded', function(){
+  window.scrollTo(0,0);
+  buildNav();
+  startClock();
+  makeRain('site-rain');
+  window.activateSwordCursor&&window.activateSwordCursor();
+  koAttachLinkHovers();
+  const ft=document.querySelector('.se-nav-tab.active');
+  if(ft) koStartParticles(ft);
+});
+</script>
+</body>
+</html>
